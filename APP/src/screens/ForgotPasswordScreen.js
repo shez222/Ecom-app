@@ -1,4 +1,4 @@
-// src/screens/LoginScreen.js
+// src/screens/ForgotPasswordScreen.js
 
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import {
@@ -16,7 +16,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { loginUser } from '../services/api';
+import { resetPassword } from '../services/api';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -25,10 +25,9 @@ import { lightTheme, darkTheme } from '../../themes';
 
 const { width, height } = Dimensions.get('window');
 
-const LoginScreen = () => {
-  const navigation = useNavigation();
+const ForgotPasswordScreen = () => {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const navigation = useNavigation();
 
   // Loading state
   const [loading, setLoading] = useState(false);
@@ -62,23 +61,31 @@ const LoginScreen = () => {
     startAnimations();
   }, []);
 
-  const handleLogin = async () => {
-    navigation.navigate('Main')
-    if (!email || !password) {
-      Alert.alert('Validation Error', 'Please enter both email and password.');
+  const handleResetPassword = async () => {
+    // navigation.navigate('Otp')
+    if (!email) {
+      Alert.alert('Validation Error', 'Please enter your email.');
+      return;
+    }
+
+    // Simple email format validation
+    const emailRegex = /\S+@\S+\.\S+/;
+    if (!emailRegex.test(email)) {
+      Alert.alert('Validation Error', 'Please enter a valid email address.');
       return;
     }
 
     setLoading(true);
 
-    // Simulate login API call
-    const response = await loginUser(email, password);
+    // Simulate reset password API call
+    const response = await resetPassword(email);
     setLoading(false);
 
     if (response) {
-      navigation.navigate('Main'); // Adjust as per your navigation structure
+      Alert.alert('Success', 'A reset link has been sent to your email.');
+      navigation.navigate('Otp'); // Navigate to the OTP screen after successful reset request
     } else {
-      Alert.alert('Login Failed', 'Invalid email or password.');
+      Alert.alert('Error', 'Failed to send reset link. Please try again later.');
     }
   };
 
@@ -100,9 +107,9 @@ const LoginScreen = () => {
               marginBottom: 30,
             }}
           >
-            <Icon name="login" size={100} color={currentTheme.primaryColor} />
+            <Icon name="lock-reset" size={100} color={currentTheme.primaryColor} />
             <Text style={[styles.title, { color: currentTheme.textColor }]}>
-              Welcome Back
+              Reset Password
             </Text>
           </Animated.View>
           <View style={styles.inputContainer}>
@@ -127,48 +134,10 @@ const LoginScreen = () => {
                 autoCapitalize="none"
                 keyboardType="email-address"
                 accessibilityLabel="Email Input"
-                returnKeyType="next"
-                onSubmitEditing={() => {
-                  passwordInputRef.current.focus();
-                }}
-                blurOnSubmit={false}
-              />
-            </View>
-            <View style={styles.inputWrapper}>
-              <Icon
-                name="lock"
-                size={24}
-                color={currentTheme.placeholderTextColor}
-                style={styles.inputIcon}
-              />
-              <TextInput
-                ref={passwordInputRef}
-                placeholder="Password"
-                placeholderTextColor={currentTheme.placeholderTextColor}
-                style={[
-                  styles.input,
-                  {
-                    color: currentTheme.textColor,
-                    backgroundColor: currentTheme.inputBackground,
-                  },
-                ]}
-                secureTextEntry
-                onChangeText={setPassword}
-                accessibilityLabel="Password Input"
                 returnKeyType="done"
-                onSubmitEditing={handleLogin}
+                onSubmitEditing={handleResetPassword}
               />
             </View>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('ForgotPassword')}
-              style={styles.forgotPasswordButton}
-              accessibilityLabel="Forgot Password Button"
-              accessibilityRole="button"
-            >
-              <Text style={[styles.forgotPasswordText, { color: currentTheme.secondaryColor }]}>
-                Forgot Password?
-              </Text>
-            </TouchableOpacity>
           </View>
           <Animated.View
             style={{
@@ -182,46 +151,34 @@ const LoginScreen = () => {
                 styles.button,
                 { backgroundColor: currentTheme.primaryColor },
               ]}
-              onPress={handleLogin}
+              onPress={handleResetPassword}
               activeOpacity={0.8}
-              accessibilityLabel="Login Button"
+              accessibilityLabel="Send Reset Link Button"
               accessibilityRole="button"
+              disabled={loading}
             >
               {loading ? (
                 <ActivityIndicator size="small" color="#FFFFFF" />
               ) : (
-                <Text style={styles.buttonText}>LOGIN</Text>
+                <Text style={styles.buttonText}>SEND RESET LINK</Text>
               )}
             </TouchableOpacity>
           </Animated.View>
-          <View style={styles.registerContainer}>
-            <Text style={[styles.accountText, { color: currentTheme.textColor }]}>
-              Don't have an account?
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Login')}
+            accessibilityLabel="Back to Login Button"
+            accessibilityRole="button"
+            style={styles.backToLoginButton}
+          >
+            <Text style={[styles.backToLoginText, { color: currentTheme.secondaryColor }]}>
+              Back to Login
             </Text>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('Register')}
-              accessibilityLabel="Sign Up Button"
-              accessibilityRole="button"
-            >
-              <Text
-                style={[
-                  styles.registerText,
-                  { color: currentTheme.secondaryColor },
-                ]}
-              >
-                {' '}
-                Sign Up
-              </Text>
-            </TouchableOpacity>
-          </View>
+          </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
     </LinearGradient>
   );
 };
-
-// Create a ref for password input
-const passwordInputRef = React.createRef();
 
 // Styles for the components
 const styles = StyleSheet.create({
@@ -266,13 +223,6 @@ const styles = StyleSheet.create({
     height: 50,
     fontSize: 16,
   },
-  forgotPasswordButton: {
-    alignSelf: 'flex-end',
-    marginTop: 5,
-  },
-  forgotPasswordText: {
-    fontSize: 14,
-  },
   button: {
     width: '100%',
     paddingVertical: 15,
@@ -286,39 +236,27 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
-    marginTop:10
   },
   buttonText: {
     color: '#FFFFFF',
     fontSize: 18,
     fontWeight: 'bold',
   },
-  registerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  backToLoginButton: {
     marginTop: 20,
   },
-  accountText: {
+  backToLoginText: {
     fontSize: 16,
-  },
-  registerText: {
-    fontSize: 16,
-    fontWeight: 'bold',
   },
 });
 
-export default LoginScreen;
+export default ForgotPasswordScreen;
 
 
 
 
 
-
-
-
-
-
-// // LoginScreen.js
+// // ForgotPasswordScreen.js
 
 // import React, { useState, useEffect, useRef, useContext } from 'react';
 // import {
@@ -329,13 +267,13 @@ export default LoginScreen;
 //   Alert,
 //   StyleSheet,
 //   Animated,
-//   ImageBackground,
 //   KeyboardAvoidingView,
 //   Platform,
 //   Dimensions,
+//   ImageBackground,
 // } from 'react-native';
 // import { useNavigation } from '@react-navigation/native';
-// import { loginUser } from '../services/api';
+// import { resetPassword } from '../services/api';
 // import Icon from 'react-native-vector-icons/MaterialIcons';
 
 // import { ThemeContext } from '../../ThemeContext';
@@ -343,10 +281,9 @@ export default LoginScreen;
 
 // const { width, height } = Dimensions.get('window');
 
-// const LoginScreen = () => {
-//   const navigation = useNavigation();
+// const ForgotPasswordScreen = () => {
 //   const [email, setEmail] = useState('');
-//   const [password, setPassword] = useState('');
+//   const navigation = useNavigation();
 
 //   // Get theme from context
 //   const { theme } = useContext(ThemeContext);
@@ -377,8 +314,7 @@ export default LoginScreen;
 //     startAnimations();
 //   }, []);
 
-//   const handleLogin = async () => {
-//     navigation.navigate('Otp'); 
+//   const handleResetPassword = async () => {
 //     // Animate button press
 //     Animated.sequence([
 //       Animated.spring(buttonAnimation, {
@@ -395,12 +331,13 @@ export default LoginScreen;
 //       }),
 //     ]).start();
 
-//     // Simulate login API call
-//     const response = await loginUser(email, password);
+//     // Implement reset password logic here
+//     const response = await resetPassword(email);
 //     if (response) {
-//       navigation.navigate('Main'); // Adjust as per your navigation structure
+//       Alert.alert('Success', 'A reset link has been sent to your email.');
+//       navigation.navigate('Otp'); // Navigate to the OTP screen after successful reset request
 //     } else {
-//       Alert.alert('Login failed', 'Please check your credentials and try again.');
+//       Alert.alert('Error', 'Please check your email and try again.');
 //     }
 //   };
 
@@ -430,9 +367,9 @@ export default LoginScreen;
 //               marginBottom: 20,
 //             }}
 //           >
-//             <Icon name="menu-book" size={100} color="#FFFFFF" />
+//             <Icon name="lock-reset" size={100} color="#FFFFFF" />
 //             <Text style={[styles.title, { color: currentTheme.textColor }]}>
-//               StudyApp
+//               Reset Password
 //             </Text>
 //           </Animated.View>
 //           <View style={styles.inputContainer}>
@@ -444,40 +381,12 @@ export default LoginScreen;
 //                 {
 //                   color: currentTheme.textColor,
 //                   backgroundColor: currentTheme.cardBackground,
-//                   borderColor: currentTheme.primaryColor,
 //                 },
 //               ]}
 //               onChangeText={setEmail}
 //               autoCapitalize="none"
 //               keyboardType="email-address"
 //             />
-//             <TextInput
-//               placeholder="Password"
-//               placeholderTextColor={currentTheme.placeholderTextColor}
-//               style={[
-//                 styles.input,
-//                 {
-//                   color: currentTheme.textColor,
-//                   backgroundColor: currentTheme.cardBackground,
-//                   borderColor: currentTheme.primaryColor,
-//                 },
-//               ]}
-//               secureTextEntry
-//               onChangeText={setPassword}
-//             />
-//             <TouchableOpacity
-//               style={styles.forgotPasswordButton}
-//               onPress={() => navigation.navigate('ForgotPassword')}
-//             >
-//               <Text
-//                 style={[
-//                   styles.forgotPasswordText,
-//                   { color: currentTheme.secondaryColor },
-//                 ]}
-//               >
-//                 Forgot Password?
-//               </Text>
-//             </TouchableOpacity>
 //           </View>
 //           <Animated.View
 //             style={{
@@ -491,27 +400,18 @@ export default LoginScreen;
 //                 styles.button,
 //                 { backgroundColor: currentTheme.primaryColor },
 //               ]}
-//               onPress={handleLogin}
+//               onPress={handleResetPassword}
 //             >
-//               <Text style={styles.buttonText}>LOGIN</Text>
+//               <Text style={styles.buttonText}>SEND RESET LINK</Text>
 //             </TouchableOpacity>
 //           </Animated.View>
-//           <View style={styles.registerContainer}>
-//             <Text style={[styles.accountText, { color: currentTheme.textColor }]}>
-//               Don't have an account?
+//           <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+//             <Text
+//               style={[styles.backToLoginText, { color: currentTheme.secondaryColor }]}
+//             >
+//               Back to Login
 //             </Text>
-//             <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-//               <Text
-//                 style={[
-//                   styles.registerText,
-//                   { color: currentTheme.secondaryColor },
-//                 ]}
-//               >
-//                 {' '}
-//                 Sign Up
-//               </Text>
-//             </TouchableOpacity>
-//           </View>
+//           </TouchableOpacity>
 //         </View>
 //       </KeyboardAvoidingView>
 //     </ImageBackground>
@@ -542,6 +442,7 @@ export default LoginScreen;
 //     textShadowColor: '#000000',
 //     textShadowOffset: { width: 0, height: 1 },
 //     textShadowRadius: 5,
+//     textAlign: 'center',
 //   },
 //   inputContainer: {
 //     width: '100%',
@@ -551,39 +452,26 @@ export default LoginScreen;
 //     width: '100%',
 //     padding: 15,
 //     marginVertical: 10,
+//     borderColor: '#B2DFDB',
 //     borderWidth: 1,
 //     borderRadius: 30,
 //   },
-//   forgotPasswordButton: {
-//     alignSelf: 'flex-end',
-//     marginVertical: 5,
-//   },
-//   forgotPasswordText: {
-//     fontSize: 14,
-//   },
 //   button: {
 //     paddingVertical: 15,
-//     paddingHorizontal: 80,
+//     paddingHorizontal: 50,
 //     borderRadius: 30,
 //     marginVertical: 20,
 //     elevation: 5,
 //   },
 //   buttonText: {
 //     color: '#FFFFFF',
-//     fontSize: 18,
-//     fontWeight: 'bold',
-//   },
-//   registerContainer: {
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//   },
-//   accountText: {
-//     fontSize: 16,
-//   },
-//   registerText: {
 //     fontSize: 16,
 //     fontWeight: 'bold',
+//   },
+//   backToLoginText: {
+//     fontSize: 16,
+//     marginTop: 10,
 //   },
 // });
 
-// export default LoginScreen;
+// export default ForgotPasswordScreen;

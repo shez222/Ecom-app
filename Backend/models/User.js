@@ -38,6 +38,8 @@ const userSchema = new mongoose.Schema(
     },
     resetPasswordToken: String,
     resetPasswordExpire: Date,
+    otp: String,
+    otpExpire: Date,
   },
   {
     // Adds createdAt and updatedAt fields
@@ -71,6 +73,12 @@ userSchema.methods.getResetPasswordToken = function () {
   this.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
 
   return resetToken;
+};
+userSchema.methods.generateOTP = function () {
+  const otp = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
+  this.otp = crypto.createHash('sha256').update(otp).digest('hex');
+  this.otpExpire = Date.now() + 10 * 60 * 1000; // 10 minutes
+  return otp;
 };
 
 module.exports = mongoose.model('User', userSchema);

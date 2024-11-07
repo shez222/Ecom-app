@@ -1,10 +1,10 @@
 import axios from 'axios';
 
-const API_URL = 'https://yourapi.com/api';
+const API_URL = 'http://localhost:5000/api';
 
 export const loginUser = async (email, password) => {
   try {
-    const response = await axios.post(`${API_URL}/login`, { email, password });
+    const response = await axios.post(`${API_URL}/auth/login`, { email, password });
     return response.data;
   } catch (error) {
     console.error('Login error:', error);
@@ -14,7 +14,7 @@ export const loginUser = async (email, password) => {
 
 export const registerUser = async (userData) => {
   try {
-    const response = await axios.post(`${API_URL}/register`, userData);
+    const response = await axios.post(`${API_URL}/auth/register`, userData);
     return response.data;
   } catch (error) {
     console.error('Registration error:', error);
@@ -24,8 +24,9 @@ export const registerUser = async (userData) => {
 
 export const resetPassword = async (email) => {
   try {
-    await axios.post(`${API_URL}/forgot-password`, { email });
-    alert('Password reset link sent to your email.');
+    const response = await axios.post(`${API_URL}/auth/forgotpassword`, { email, role: 'user' });
+    return response.data;
+    // alert('Password reset link sent to your email.');
   } catch (error) {
     console.error('Reset password error:', error);
   }

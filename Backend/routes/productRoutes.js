@@ -1,19 +1,21 @@
 // routes/productRoutes.js
 
 const express = require('express');
+const router = express.Router();
 const {
-  getProducts,
-  getProduct,
-  createProduct,
+  fetchProducts,
+  addProduct,
   updateProduct,
   deleteProduct,
 } = require('../controllers/productController');
+
+// Middleware for authentication and authorization
 const { protect, authorize } = require('../middleware/authMiddleware');
 
-const router = express.Router();
+// Fetch all products/exams
+router.route('/').get(protect, authorize('admin'), fetchProducts).post(protect, authorize('admin'), addProduct);
 
-// Public routes
-router.route('/').get(getProducts).post(protect, authorize('admin'), createProduct);
-router.route('/:id').get(getProduct).put(protect, authorize('admin'), updateProduct).delete(protect, authorize('admin'), deleteProduct);
+// Update and delete specific product/exam by ID
+router.route('/:id').put(protect, authorize('admin'), updateProduct).delete(protect, authorize('admin'), deleteProduct);
 
 module.exports = router;

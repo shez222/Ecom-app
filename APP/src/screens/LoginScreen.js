@@ -1,4 +1,4 @@
-// src/screens/RegisterScreen.js
+// src/screens/LoginScreen.js
 
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import {
@@ -16,7 +16,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { registerUser } from '../services/api';
+import { loginUser } from '../services/api';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -25,14 +25,10 @@ import { lightTheme, darkTheme } from '../../themes';
 
 const { width, height } = Dimensions.get('window');
 
-const RegisterScreen = () => {
+const LoginScreen = () => {
   const navigation = useNavigation();
-  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
-  // Confirm password state
-  const [confirmPassword, setConfirmPassword] = useState('');
 
   // Loading state
   const [loading, setLoading] = useState(false);
@@ -66,30 +62,23 @@ const RegisterScreen = () => {
     startAnimations();
   }, []);
 
-  const handleRegister = async () => {
-    navigation.navigate('Login')
-    if (!name || !email || !password || !confirmPassword) {
-      Alert.alert('Validation Error', 'Please fill in all fields.');
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      Alert.alert('Validation Error', 'Passwords do not match.');
+  const handleLogin = async () => {
+    // navigation.navigate('Main')
+    if (!email || !password) {
+      Alert.alert('Validation Error', 'Please enter both email and password.');
       return;
     }
 
     setLoading(true);
 
-    // Simulate registration API call
-    const userData = { name, email, password };
-    const response = await registerUser(userData);
+    // Simulate login API call
+    const response = await loginUser(email, password);
     setLoading(false);
 
     if (response) {
-      Alert.alert('Success', 'Account created successfully!');
-      navigation.navigate('Login');
+      navigation.navigate('Main'); // Adjust as per your navigation structure
     } else {
-      Alert.alert('Registration Failed', 'Please check your details and try again.');
+      Alert.alert('Login Failed', 'Invalid email or password.');
     }
   };
 
@@ -111,38 +100,12 @@ const RegisterScreen = () => {
               marginBottom: 30,
             }}
           >
-            <Icon name="person-add" size={100} color={currentTheme.primaryColor} />
+            <Icon name="login" size={100} color={currentTheme.primaryColor} />
             <Text style={[styles.title, { color: currentTheme.textColor }]}>
-              Create Account
+              Welcome Back
             </Text>
           </Animated.View>
           <View style={styles.inputContainer}>
-            <View style={styles.inputWrapper}>
-              <Icon
-                name="person"
-                size={24}
-                color={currentTheme.placeholderTextColor}
-                style={styles.inputIcon}
-              />
-              <TextInput
-                placeholder="Name"
-                placeholderTextColor={currentTheme.placeholderTextColor}
-                style={[
-                  styles.input,
-                  {
-                    color: currentTheme.textColor,
-                    backgroundColor: currentTheme.inputBackground,
-                  },
-                ]}
-                onChangeText={setName}
-                accessibilityLabel="Name Input"
-                returnKeyType="next"
-                onSubmitEditing={() => {
-                  emailInputRef.current.focus();
-                }}
-                blurOnSubmit={false}
-              />
-            </View>
             <View style={styles.inputWrapper}>
               <Icon
                 name="email"
@@ -151,7 +114,6 @@ const RegisterScreen = () => {
                 style={styles.inputIcon}
               />
               <TextInput
-                ref={emailInputRef}
                 placeholder="Email"
                 placeholderTextColor={currentTheme.placeholderTextColor}
                 style={[
@@ -193,38 +155,20 @@ const RegisterScreen = () => {
                 secureTextEntry
                 onChangeText={setPassword}
                 accessibilityLabel="Password Input"
-                returnKeyType="next"
-                onSubmitEditing={() => {
-                  confirmPasswordInputRef.current.focus();
-                }}
-                blurOnSubmit={false}
-              />
-            </View>
-            <View style={styles.inputWrapper}>
-              <Icon
-                name="lock-outline"
-                size={24}
-                color={currentTheme.placeholderTextColor}
-                style={styles.inputIcon}
-              />
-              <TextInput
-                ref={confirmPasswordInputRef}
-                placeholder="Confirm Password"
-                placeholderTextColor={currentTheme.placeholderTextColor}
-                style={[
-                  styles.input,
-                  {
-                    color: currentTheme.textColor,
-                    backgroundColor: currentTheme.inputBackground,
-                  },
-                ]}
-                secureTextEntry
-                onChangeText={setConfirmPassword}
-                accessibilityLabel="Confirm Password Input"
                 returnKeyType="done"
-                onSubmitEditing={handleRegister}
+                onSubmitEditing={handleLogin}
               />
             </View>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('ForgotPassword')}
+              style={styles.forgotPasswordButton}
+              accessibilityLabel="Forgot Password Button"
+              accessibilityRole="button"
+            >
+              <Text style={[styles.forgotPasswordText, { color: currentTheme.secondaryColor }]}>
+                Forgot Password?
+              </Text>
+            </TouchableOpacity>
           </View>
           <Animated.View
             style={{
@@ -238,35 +182,35 @@ const RegisterScreen = () => {
                 styles.button,
                 { backgroundColor: currentTheme.primaryColor },
               ]}
-              onPress={handleRegister}
+              onPress={handleLogin}
               activeOpacity={0.8}
-              accessibilityLabel="Register Button"
+              accessibilityLabel="Login Button"
               accessibilityRole="button"
             >
               {loading ? (
                 <ActivityIndicator size="small" color="#FFFFFF" />
               ) : (
-                <Text style={styles.buttonText}>REGISTER</Text>
+                <Text style={styles.buttonText}>LOGIN</Text>
               )}
             </TouchableOpacity>
           </Animated.View>
-          <View style={styles.loginContainer}>
+          <View style={styles.registerContainer}>
             <Text style={[styles.accountText, { color: currentTheme.textColor }]}>
-              Already have an account?
+              Don't have an account?
             </Text>
             <TouchableOpacity
-              onPress={() => navigation.navigate('Login')}
-              accessibilityLabel="Login Button"
+              onPress={() => navigation.navigate('Register')}
+              accessibilityLabel="Sign Up Button"
               accessibilityRole="button"
             >
               <Text
                 style={[
-                  styles.loginText,
+                  styles.registerText,
                   { color: currentTheme.secondaryColor },
                 ]}
               >
                 {' '}
-                Login
+                Sign Up
               </Text>
             </TouchableOpacity>
           </View>
@@ -276,10 +220,8 @@ const RegisterScreen = () => {
   );
 };
 
-// Create refs for input fields
-const emailInputRef = React.createRef();
+// Create a ref for password input
 const passwordInputRef = React.createRef();
-const confirmPasswordInputRef = React.createRef();
 
 // Styles for the components
 const styles = StyleSheet.create({
@@ -324,6 +266,13 @@ const styles = StyleSheet.create({
     height: 50,
     fontSize: 16,
   },
+  forgotPasswordButton: {
+    alignSelf: 'flex-end',
+    marginTop: 5,
+  },
+  forgotPasswordText: {
+    fontSize: 14,
+  },
   button: {
     width: '100%',
     paddingVertical: 15,
@@ -337,13 +286,14 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
+    marginTop:10
   },
   buttonText: {
     color: '#FFFFFF',
     fontSize: 18,
     fontWeight: 'bold',
   },
-  loginContainer: {
+  registerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 20,
@@ -351,18 +301,24 @@ const styles = StyleSheet.create({
   accountText: {
     fontSize: 16,
   },
-  loginText: {
+  registerText: {
     fontSize: 16,
     fontWeight: 'bold',
   },
 });
 
-export default RegisterScreen;
+export default LoginScreen;
 
 
 
 
-// // RegisterScreen.js
+
+
+
+
+
+
+// // LoginScreen.js
 
 // import React, { useState, useEffect, useRef, useContext } from 'react';
 // import {
@@ -373,13 +329,13 @@ export default RegisterScreen;
 //   Alert,
 //   StyleSheet,
 //   Animated,
+//   ImageBackground,
 //   KeyboardAvoidingView,
 //   Platform,
 //   Dimensions,
-//   ImageBackground,
 // } from 'react-native';
 // import { useNavigation } from '@react-navigation/native';
-// import { registerUser } from '../services/api';
+// import { loginUser } from '../services/api';
 // import Icon from 'react-native-vector-icons/MaterialIcons';
 
 // import { ThemeContext } from '../../ThemeContext';
@@ -387,9 +343,8 @@ export default RegisterScreen;
 
 // const { width, height } = Dimensions.get('window');
 
-// const RegisterScreen = () => {
+// const LoginScreen = () => {
 //   const navigation = useNavigation();
-//   const [name, setName] = useState('');
 //   const [email, setEmail] = useState('');
 //   const [password, setPassword] = useState('');
 
@@ -422,7 +377,8 @@ export default RegisterScreen;
 //     startAnimations();
 //   }, []);
 
-//   const handleRegister = async () => {
+//   const handleLogin = async () => {
+//     navigation.navigate('Otp'); 
 //     // Animate button press
 //     Animated.sequence([
 //       Animated.spring(buttonAnimation, {
@@ -439,14 +395,12 @@ export default RegisterScreen;
 //       }),
 //     ]).start();
 
-//     // Simulate registration API call
-//     const userData = { name, email, password };
-//     const response = await registerUser(userData);
+//     // Simulate login API call
+//     const response = await loginUser(email, password);
 //     if (response) {
-//       Alert.alert('Success', 'Account created successfully!');
-//       navigation.navigate('Login');
+//       navigation.navigate('Main'); // Adjust as per your navigation structure
 //     } else {
-//       Alert.alert('Registration Failed', 'Please check your details and try again.');
+//       Alert.alert('Login failed', 'Please check your credentials and try again.');
 //     }
 //   };
 
@@ -476,25 +430,12 @@ export default RegisterScreen;
 //               marginBottom: 20,
 //             }}
 //           >
-//             <Icon name="person-add" size={100} color="#FFFFFF" />
+//             <Icon name="menu-book" size={100} color="#FFFFFF" />
 //             <Text style={[styles.title, { color: currentTheme.textColor }]}>
-//               Create Account
+//               StudyApp
 //             </Text>
 //           </Animated.View>
 //           <View style={styles.inputContainer}>
-//             <TextInput
-//               placeholder="Name"
-//               placeholderTextColor={currentTheme.placeholderTextColor}
-//               style={[
-//                 styles.input,
-//                 {
-//                   color: currentTheme.textColor,
-//                   backgroundColor: currentTheme.cardBackground,
-//                   borderColor: currentTheme.primaryColor,
-//                 },
-//               ]}
-//               onChangeText={setName}
-//             />
 //             <TextInput
 //               placeholder="Email"
 //               placeholderTextColor={currentTheme.placeholderTextColor}
@@ -524,6 +465,19 @@ export default RegisterScreen;
 //               secureTextEntry
 //               onChangeText={setPassword}
 //             />
+//             <TouchableOpacity
+//               style={styles.forgotPasswordButton}
+//               onPress={() => navigation.navigate('ForgotPassword')}
+//             >
+//               <Text
+//                 style={[
+//                   styles.forgotPasswordText,
+//                   { color: currentTheme.secondaryColor },
+//                 ]}
+//               >
+//                 Forgot Password?
+//               </Text>
+//             </TouchableOpacity>
 //           </View>
 //           <Animated.View
 //             style={{
@@ -537,24 +491,24 @@ export default RegisterScreen;
 //                 styles.button,
 //                 { backgroundColor: currentTheme.primaryColor },
 //               ]}
-//               onPress={handleRegister}
+//               onPress={handleLogin}
 //             >
-//               <Text style={styles.buttonText}>REGISTER</Text>
+//               <Text style={styles.buttonText}>LOGIN</Text>
 //             </TouchableOpacity>
 //           </Animated.View>
-//           <View style={styles.loginContainer}>
+//           <View style={styles.registerContainer}>
 //             <Text style={[styles.accountText, { color: currentTheme.textColor }]}>
-//               Already have an account?
+//               Don't have an account?
 //             </Text>
-//             <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+//             <TouchableOpacity onPress={() => navigation.navigate('Register')}>
 //               <Text
 //                 style={[
-//                   styles.loginText,
+//                   styles.registerText,
 //                   { color: currentTheme.secondaryColor },
 //                 ]}
 //               >
 //                 {' '}
-//                 Login
+//                 Sign Up
 //               </Text>
 //             </TouchableOpacity>
 //           </View>
@@ -600,6 +554,13 @@ export default RegisterScreen;
 //     borderWidth: 1,
 //     borderRadius: 30,
 //   },
+//   forgotPasswordButton: {
+//     alignSelf: 'flex-end',
+//     marginVertical: 5,
+//   },
+//   forgotPasswordText: {
+//     fontSize: 14,
+//   },
 //   button: {
 //     paddingVertical: 15,
 //     paddingHorizontal: 80,
@@ -612,17 +573,17 @@ export default RegisterScreen;
 //     fontSize: 18,
 //     fontWeight: 'bold',
 //   },
-//   loginContainer: {
+//   registerContainer: {
 //     flexDirection: 'row',
 //     alignItems: 'center',
 //   },
 //   accountText: {
 //     fontSize: 16,
 //   },
-//   loginText: {
+//   registerText: {
 //     fontSize: 16,
 //     fontWeight: 'bold',
 //   },
 // });
 
-// export default RegisterScreen;
+// export default LoginScreen;

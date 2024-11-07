@@ -1,4 +1,4 @@
-// src/screens/ForgotPasswordScreen.js
+// src/screens/RegisterScreen.js
 
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import {
@@ -16,7 +16,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { resetPassword } from '../services/api';
+import { registerUser } from '../services/api';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -25,9 +25,14 @@ import { lightTheme, darkTheme } from '../../themes';
 
 const { width, height } = Dimensions.get('window');
 
-const ForgotPasswordScreen = () => {
-  const [email, setEmail] = useState('');
+const RegisterScreen = () => {
   const navigation = useNavigation();
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  // Confirm password state
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   // Loading state
   const [loading, setLoading] = useState(false);
@@ -61,31 +66,30 @@ const ForgotPasswordScreen = () => {
     startAnimations();
   }, []);
 
-  const handleResetPassword = async () => {
-    navigation.navigate('Otp')
-    if (!email) {
-      Alert.alert('Validation Error', 'Please enter your email.');
+  const handleRegister = async () => {
+    // navigation.navigate('Login')
+    if (!name || !email || !password || !confirmPassword) {
+      Alert.alert('Validation Error', 'Please fill in all fields.');
       return;
     }
 
-    // Simple email format validation
-    const emailRegex = /\S+@\S+\.\S+/;
-    if (!emailRegex.test(email)) {
-      Alert.alert('Validation Error', 'Please enter a valid email address.');
+    if (password !== confirmPassword) {
+      Alert.alert('Validation Error', 'Passwords do not match.');
       return;
     }
 
     setLoading(true);
 
-    // Simulate reset password API call
-    const response = await resetPassword(email);
+    // Simulate registration API call
+    const userData = { name, email, password, role: 'user' };
+    const response = await registerUser(userData);
     setLoading(false);
 
     if (response) {
-      Alert.alert('Success', 'A reset link has been sent to your email.');
-      navigation.navigate('Otp'); // Navigate to the OTP screen after successful reset request
+      Alert.alert('Success', 'Account created successfully!');
+      navigation.navigate('Login');
     } else {
-      Alert.alert('Error', 'Failed to send reset link. Please try again later.');
+      Alert.alert('Registration Failed', 'Please check your details and try again.');
     }
   };
 
@@ -107,12 +111,38 @@ const ForgotPasswordScreen = () => {
               marginBottom: 30,
             }}
           >
-            <Icon name="lock-reset" size={100} color={currentTheme.primaryColor} />
+            <Icon name="person-add" size={100} color={currentTheme.primaryColor} />
             <Text style={[styles.title, { color: currentTheme.textColor }]}>
-              Reset Password
+              Create Account
             </Text>
           </Animated.View>
           <View style={styles.inputContainer}>
+            <View style={styles.inputWrapper}>
+              <Icon
+                name="person"
+                size={24}
+                color={currentTheme.placeholderTextColor}
+                style={styles.inputIcon}
+              />
+              <TextInput
+                placeholder="Name"
+                placeholderTextColor={currentTheme.placeholderTextColor}
+                style={[
+                  styles.input,
+                  {
+                    color: currentTheme.textColor,
+                    backgroundColor: currentTheme.inputBackground,
+                  },
+                ]}
+                onChangeText={setName}
+                accessibilityLabel="Name Input"
+                returnKeyType="next"
+                onSubmitEditing={() => {
+                  emailInputRef.current.focus();
+                }}
+                blurOnSubmit={false}
+              />
+            </View>
             <View style={styles.inputWrapper}>
               <Icon
                 name="email"
@@ -121,6 +151,7 @@ const ForgotPasswordScreen = () => {
                 style={styles.inputIcon}
               />
               <TextInput
+                ref={emailInputRef}
                 placeholder="Email"
                 placeholderTextColor={currentTheme.placeholderTextColor}
                 style={[
@@ -134,8 +165,64 @@ const ForgotPasswordScreen = () => {
                 autoCapitalize="none"
                 keyboardType="email-address"
                 accessibilityLabel="Email Input"
+                returnKeyType="next"
+                onSubmitEditing={() => {
+                  passwordInputRef.current.focus();
+                }}
+                blurOnSubmit={false}
+              />
+            </View>
+            <View style={styles.inputWrapper}>
+              <Icon
+                name="lock"
+                size={24}
+                color={currentTheme.placeholderTextColor}
+                style={styles.inputIcon}
+              />
+              <TextInput
+                ref={passwordInputRef}
+                placeholder="Password"
+                placeholderTextColor={currentTheme.placeholderTextColor}
+                style={[
+                  styles.input,
+                  {
+                    color: currentTheme.textColor,
+                    backgroundColor: currentTheme.inputBackground,
+                  },
+                ]}
+                secureTextEntry
+                onChangeText={setPassword}
+                accessibilityLabel="Password Input"
+                returnKeyType="next"
+                onSubmitEditing={() => {
+                  confirmPasswordInputRef.current.focus();
+                }}
+                blurOnSubmit={false}
+              />
+            </View>
+            <View style={styles.inputWrapper}>
+              <Icon
+                name="lock-outline"
+                size={24}
+                color={currentTheme.placeholderTextColor}
+                style={styles.inputIcon}
+              />
+              <TextInput
+                ref={confirmPasswordInputRef}
+                placeholder="Confirm Password"
+                placeholderTextColor={currentTheme.placeholderTextColor}
+                style={[
+                  styles.input,
+                  {
+                    color: currentTheme.textColor,
+                    backgroundColor: currentTheme.inputBackground,
+                  },
+                ]}
+                secureTextEntry
+                onChangeText={setConfirmPassword}
+                accessibilityLabel="Confirm Password Input"
                 returnKeyType="done"
-                onSubmitEditing={handleResetPassword}
+                onSubmitEditing={handleRegister}
               />
             </View>
           </View>
@@ -151,34 +238,48 @@ const ForgotPasswordScreen = () => {
                 styles.button,
                 { backgroundColor: currentTheme.primaryColor },
               ]}
-              onPress={handleResetPassword}
+              onPress={handleRegister}
               activeOpacity={0.8}
-              accessibilityLabel="Send Reset Link Button"
+              accessibilityLabel="Register Button"
               accessibilityRole="button"
-              disabled={loading}
             >
               {loading ? (
                 <ActivityIndicator size="small" color="#FFFFFF" />
               ) : (
-                <Text style={styles.buttonText}>SEND RESET LINK</Text>
+                <Text style={styles.buttonText}>REGISTER</Text>
               )}
             </TouchableOpacity>
           </Animated.View>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('Login')}
-            accessibilityLabel="Back to Login Button"
-            accessibilityRole="button"
-            style={styles.backToLoginButton}
-          >
-            <Text style={[styles.backToLoginText, { color: currentTheme.secondaryColor }]}>
-              Back to Login
+          <View style={styles.loginContainer}>
+            <Text style={[styles.accountText, { color: currentTheme.textColor }]}>
+              Already have an account?
             </Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Login')}
+              accessibilityLabel="Login Button"
+              accessibilityRole="button"
+            >
+              <Text
+                style={[
+                  styles.loginText,
+                  { color: currentTheme.secondaryColor },
+                ]}
+              >
+                {' '}
+                Login
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </KeyboardAvoidingView>
     </LinearGradient>
   );
 };
+
+// Create refs for input fields
+const emailInputRef = React.createRef();
+const passwordInputRef = React.createRef();
+const confirmPasswordInputRef = React.createRef();
 
 // Styles for the components
 const styles = StyleSheet.create({
@@ -242,21 +343,26 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
-  backToLoginButton: {
+  loginContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginTop: 20,
   },
-  backToLoginText: {
+  accountText: {
     fontSize: 16,
+  },
+  loginText: {
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 
-export default ForgotPasswordScreen;
+export default RegisterScreen;
 
 
 
 
-
-// // ForgotPasswordScreen.js
+// // RegisterScreen.js
 
 // import React, { useState, useEffect, useRef, useContext } from 'react';
 // import {
@@ -273,7 +379,7 @@ export default ForgotPasswordScreen;
 //   ImageBackground,
 // } from 'react-native';
 // import { useNavigation } from '@react-navigation/native';
-// import { resetPassword } from '../services/api';
+// import { registerUser } from '../services/api';
 // import Icon from 'react-native-vector-icons/MaterialIcons';
 
 // import { ThemeContext } from '../../ThemeContext';
@@ -281,9 +387,11 @@ export default ForgotPasswordScreen;
 
 // const { width, height } = Dimensions.get('window');
 
-// const ForgotPasswordScreen = () => {
-//   const [email, setEmail] = useState('');
+// const RegisterScreen = () => {
 //   const navigation = useNavigation();
+//   const [name, setName] = useState('');
+//   const [email, setEmail] = useState('');
+//   const [password, setPassword] = useState('');
 
 //   // Get theme from context
 //   const { theme } = useContext(ThemeContext);
@@ -314,7 +422,7 @@ export default ForgotPasswordScreen;
 //     startAnimations();
 //   }, []);
 
-//   const handleResetPassword = async () => {
+//   const handleRegister = async () => {
 //     // Animate button press
 //     Animated.sequence([
 //       Animated.spring(buttonAnimation, {
@@ -331,13 +439,14 @@ export default ForgotPasswordScreen;
 //       }),
 //     ]).start();
 
-//     // Implement reset password logic here
-//     const response = await resetPassword(email);
+//     // Simulate registration API call
+//     const userData = { name, email, password };
+//     const response = await registerUser(userData);
 //     if (response) {
-//       Alert.alert('Success', 'A reset link has been sent to your email.');
-//       navigation.navigate('Otp'); // Navigate to the OTP screen after successful reset request
+//       Alert.alert('Success', 'Account created successfully!');
+//       navigation.navigate('Login');
 //     } else {
-//       Alert.alert('Error', 'Please check your email and try again.');
+//       Alert.alert('Registration Failed', 'Please check your details and try again.');
 //     }
 //   };
 
@@ -367,12 +476,25 @@ export default ForgotPasswordScreen;
 //               marginBottom: 20,
 //             }}
 //           >
-//             <Icon name="lock-reset" size={100} color="#FFFFFF" />
+//             <Icon name="person-add" size={100} color="#FFFFFF" />
 //             <Text style={[styles.title, { color: currentTheme.textColor }]}>
-//               Reset Password
+//               Create Account
 //             </Text>
 //           </Animated.View>
 //           <View style={styles.inputContainer}>
+//             <TextInput
+//               placeholder="Name"
+//               placeholderTextColor={currentTheme.placeholderTextColor}
+//               style={[
+//                 styles.input,
+//                 {
+//                   color: currentTheme.textColor,
+//                   backgroundColor: currentTheme.cardBackground,
+//                   borderColor: currentTheme.primaryColor,
+//                 },
+//               ]}
+//               onChangeText={setName}
+//             />
 //             <TextInput
 //               placeholder="Email"
 //               placeholderTextColor={currentTheme.placeholderTextColor}
@@ -381,11 +503,26 @@ export default ForgotPasswordScreen;
 //                 {
 //                   color: currentTheme.textColor,
 //                   backgroundColor: currentTheme.cardBackground,
+//                   borderColor: currentTheme.primaryColor,
 //                 },
 //               ]}
 //               onChangeText={setEmail}
 //               autoCapitalize="none"
 //               keyboardType="email-address"
+//             />
+//             <TextInput
+//               placeholder="Password"
+//               placeholderTextColor={currentTheme.placeholderTextColor}
+//               style={[
+//                 styles.input,
+//                 {
+//                   color: currentTheme.textColor,
+//                   backgroundColor: currentTheme.cardBackground,
+//                   borderColor: currentTheme.primaryColor,
+//                 },
+//               ]}
+//               secureTextEntry
+//               onChangeText={setPassword}
 //             />
 //           </View>
 //           <Animated.View
@@ -400,18 +537,27 @@ export default ForgotPasswordScreen;
 //                 styles.button,
 //                 { backgroundColor: currentTheme.primaryColor },
 //               ]}
-//               onPress={handleResetPassword}
+//               onPress={handleRegister}
 //             >
-//               <Text style={styles.buttonText}>SEND RESET LINK</Text>
+//               <Text style={styles.buttonText}>REGISTER</Text>
 //             </TouchableOpacity>
 //           </Animated.View>
-//           <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-//             <Text
-//               style={[styles.backToLoginText, { color: currentTheme.secondaryColor }]}
-//             >
-//               Back to Login
+//           <View style={styles.loginContainer}>
+//             <Text style={[styles.accountText, { color: currentTheme.textColor }]}>
+//               Already have an account?
 //             </Text>
-//           </TouchableOpacity>
+//             <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+//               <Text
+//                 style={[
+//                   styles.loginText,
+//                   { color: currentTheme.secondaryColor },
+//                 ]}
+//               >
+//                 {' '}
+//                 Login
+//               </Text>
+//             </TouchableOpacity>
+//           </View>
 //         </View>
 //       </KeyboardAvoidingView>
 //     </ImageBackground>
@@ -442,7 +588,6 @@ export default ForgotPasswordScreen;
 //     textShadowColor: '#000000',
 //     textShadowOffset: { width: 0, height: 1 },
 //     textShadowRadius: 5,
-//     textAlign: 'center',
 //   },
 //   inputContainer: {
 //     width: '100%',
@@ -452,26 +597,32 @@ export default ForgotPasswordScreen;
 //     width: '100%',
 //     padding: 15,
 //     marginVertical: 10,
-//     borderColor: '#B2DFDB',
 //     borderWidth: 1,
 //     borderRadius: 30,
 //   },
 //   button: {
 //     paddingVertical: 15,
-//     paddingHorizontal: 50,
+//     paddingHorizontal: 80,
 //     borderRadius: 30,
 //     marginVertical: 20,
 //     elevation: 5,
 //   },
 //   buttonText: {
 //     color: '#FFFFFF',
+//     fontSize: 18,
+//     fontWeight: 'bold',
+//   },
+//   loginContainer: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//   },
+//   accountText: {
+//     fontSize: 16,
+//   },
+//   loginText: {
 //     fontSize: 16,
 //     fontWeight: 'bold',
 //   },
-//   backToLoginText: {
-//     fontSize: 16,
-//     marginTop: 10,
-//   },
 // });
 
-// export default ForgotPasswordScreen;
+// export default RegisterScreen;
