@@ -7,7 +7,7 @@ export const loginAdmin = createAsyncThunk(
   'auth/loginAdmin',
   async ({ email, password }, thunkAPI) => {
     try {
-      const response = await axiosInstance.post('admin/api/auth/login', { email, password });
+      const response = await axiosInstance.post('api/auth/login', { email, password });
       const data = response.data;
       // Store token in localStorage
       localStorage.setItem('adminToken', data.token);
@@ -25,7 +25,7 @@ export const registerAdmin = createAsyncThunk(
   'auth/registerAdmin',
   async ({ name, email, password, role }, thunkAPI) => {
     try {
-      const response = await axiosInstance.post('admin/api/auth/register', { name, email, password, role });
+      const response = await axiosInstance.post('api/auth/register', { name, email, password, role });
       const data = response.data;
       console.log(data);
       return data;Z
@@ -48,7 +48,7 @@ export const forgotPassword = createAsyncThunk(
   'auth/forgotPassword',
   async (email, thunkAPI) => {
     try {
-      const response = await axiosInstance.post('admin/api/auth/forgotpassword', { email });
+      const response = await axiosInstance.post('api/auth/forgotpassword', { email });
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(
@@ -63,7 +63,7 @@ export const resetPassword = createAsyncThunk(
   'auth/resetPassword',
   async ({ resetToken, password }, thunkAPI) => {
     try {
-      const response = await axiosInstance.put(`admin/api/auth/resetpassword/${resetToken}`, { password });
+      const response = await axiosInstance.put(`api/auth/resetpassword/${resetToken}`, { password });
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(

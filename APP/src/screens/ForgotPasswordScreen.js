@@ -16,7 +16,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { resetPassword } from '../services/api';
+import { forgotPassword } from '../services/api';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -78,12 +78,12 @@ const ForgotPasswordScreen = () => {
     setLoading(true);
 
     // Simulate reset password API call
-    const response = await resetPassword(email);
+    const response = await forgotPassword(email);
     setLoading(false);
 
     if (response) {
       Alert.alert('Success', 'A reset link has been sent to your email.');
-      navigation.navigate('Otp'); // Navigate to the OTP screen after successful reset request
+      navigation.navigate('Otp', { email }); // Navigate to the OTP screen after successful reset request
     } else {
       Alert.alert('Error', 'Failed to send reset link. Please try again later.');
     }

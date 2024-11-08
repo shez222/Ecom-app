@@ -7,7 +7,7 @@ const Product = require('../models/Product');
 // @route   GET /api/products
 // @access  Public/Admin
 const fetchProducts = asyncHandler(async (req, res) => {
-  const products = await Product.find({});
+  const products = await Product.find({}).select('-__v'); // Exclude __v field
   res.status(200).json({ success: true, count: products.length, data: products });
 });
 

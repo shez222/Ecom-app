@@ -14,8 +14,8 @@ import {
   Platform,
   Dimensions,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { updatePassword } from '../services/api';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { resetPassword } from '../services/api';
 import Ionicons from 'react-native-vector-icons/Ionicons'; // Corrected Import
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -27,6 +27,8 @@ const { width, height } = Dimensions.get('window');
 const NewPasswordScreen = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const route = useRoute();
+  const { email } = route.params; 
 
   // Password visibility states
   const [secureEntry, setSecureEntry] = useState(true);
@@ -109,7 +111,7 @@ const NewPasswordScreen = () => {
   };
 
   const handleUpdatePassword = async () => {
-    navigation.navigate('Login')
+    // navigation.navigate('Login')
     if (!newPassword || !confirmPassword) {
       setError('Please fill in all fields.');
       return;
@@ -130,16 +132,19 @@ const NewPasswordScreen = () => {
     setError('');
 
     try {
-      const response = await updatePassword(newPassword);
+      console.log(email,newPassword);
+      
+      const response = await resetPassword(email,newPassword);
       setLoading(false);
 
       if (response) {
-        Alert.alert('Success', 'Your password has been updated successfully!', [
-          {
-            text: 'OK',
-            onPress: () => navigation.navigate('Login'),
-          },
-        ]);
+        navigation.navigate('Login')
+        // Alert.alert('Success', 'Your password has been updated successfully!', [
+        //   {
+        //     text: 'OK',
+        //     onPress: () => navigation.navigate('Login'),
+        //   },
+        // ]);
       } else {
         setError('Failed to update password. Please try again later.');
       }

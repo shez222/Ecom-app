@@ -391,6 +391,10 @@ const verifyOTP = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Invalid OTP.' });
     }
 
+    user.otp = undefined;
+    user.otpExpire = undefined;
+    await user.save();
+
     // OTP is valid, allow password reset
     // Optionally, you can generate a reset token here and send it
     // For simplicity, respond with success and allow password reset
@@ -405,10 +409,13 @@ const verifyOTP = async (req, res) => {
 // @route   POST /api/auth/reset-password
 // @access  Public
 const resetPasswordOtp = async (req, res) => {
-  const { email, role, otp, newPassword } = req.body;
+  const { email, role, newPassword } = req.body;
+  
 
   // Validate input
-  if (!email || !role || !otp || !newPassword) {
+  if (!email || !role || !newPassword) {
+    console.log("sheheheeh");
+  
     return res.status(400).json({ success: false, message: 'Please provide email, role, OTP, and new password.' });
   }
 
@@ -416,28 +423,11 @@ const resetPasswordOtp = async (req, res) => {
     const user = await User.findOne({ email, role });
 
     if (!user) {
+      console.log("heheheh");
       return res.status(404).json({ success: false, message: 'Invalid email or role.' });
     }
-
-    if (!user.otp || !user.otpExpire) {
-      return res.status(400).json({ success: false, message: 'OTP not set. Please request a new OTP.' });
-    }
-
-    if (user.otpExpire < Date.now()) {
-      return res.status(400).json({ success: false, message: 'OTP has expired. Please request a new OTP.' });
-    }
-
-    // Hash the provided OTP to compare with stored hash
-    const hashedOTP = crypto.createHash('sha256').update(otp).digest('hex');
-
-    if (hashedOTP !== user.otp) {
-      return res.status(400).json({ success: false, message: 'Invalid OTP.' });
-    }
-
     // OTP is valid, proceed to reset password
     user.password = newPassword;
-    user.otp = undefined;
-    user.otpExpire = undefined;
     await user.save();
 
     res.status(200).json({ success: true, message: 'Password has been reset successfully.' });

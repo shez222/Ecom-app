@@ -17,7 +17,7 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { verifyOtp, resendOtp } from '../services/api';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons'; // Updated Import for Expo
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -31,6 +31,9 @@ const OtpScreen = () => {
   const [error, setError] = useState('');
   const [timer, setTimer] = useState(60); // 60 seconds countdown
   const navigation = useNavigation();
+  const route = useRoute(); 
+
+  const { email } = route.params;
 
   // Get theme from context
   const { theme } = useContext(ThemeContext);
@@ -119,16 +122,19 @@ const OtpScreen = () => {
     setError('');
 
     try {
-      const response = await verifyOtp(otpString);
+      const response = await verifyOtp( email, otpString );
       setLoading(false);
 
       if (response) {
-        Alert.alert('Success', 'OTP verified successfully!', [
-          {
-            text: 'OK',
-            onPress: () => navigation.navigate('NewPassword'),
-          },
-        ]);
+        Alert.alert('Success', 'OTP verified successfully!', 
+        //   [
+        //   {
+        //     text: 'OK',
+        //     onPress: () => navigation.navigate('NewPassword'),
+        //   },
+        // ]
+      );
+        navigation.navigate('NewPassword', { email: email });
       } else {
         setError('Invalid OTP. Please try again.');
         triggerShake();

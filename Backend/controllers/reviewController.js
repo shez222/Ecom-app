@@ -1,208 +1,117 @@
 // controllers/reviewController.js
 
+const asyncHandler = require('express-async-handler');
 const Review = require('../models/Review');
+const Product = require('../models/Product');
+const User = require('../models/User');
 
-// @desc    Get all reviews
-// @route   GET /api/reviews
-// @access  Private/Admin
-const getReviews = async (req, res) => {
-  try {
-    const reviews = await Review.find();
-
-    res.status(200).json({
-      success: true,
-      count: reviews.length,
-      data: reviews,
-    });
-  } catch (error) {
-    res.status(500).json({ success: false, message: 'Server Error' });
-  }
-};
-
-// @desc    Get single review
-// @route   GET /api/reviews/:id
-// @access  Private/Admin
-const getReview = async (req, res) => {
-  try {
-    const review = await Review.findById(req.params.id);
-
-    if (!review) {
-      return res
-        .status(404)
-        .json({ success: false, message: 'Review not found' });
-    }
-
-    res.status(200).json({
-      success: true,
-      data: review,
-    });
-  } catch (error) {
-    res.status(500).json({ success: false, message: 'Server Error' });
-  }
-};
-
-// @desc    Create new review
+// @desc    Add or Update a product review
 // @route   POST /api/reviews
-// @access  Private/Admin
-const createReview = async (req, res) => {
-  try {
-    const { reviewId, user, product, rating, comment } = req.body;
+// @access  Private/User
+const addOrUpdateReview = asyncHandler(async (req, res) => {
+  const { productId, rating, comment } = req.body;
 
-    // Simple validation
-    if (!reviewId || !user || !product || !rating || !comment) {
-      return res
-        .status(400)
-        .json({ success: false, message: 'Please provide all fields' });
-    }
+  // Validate input
+  if (!productId || !rating || !comment) {
+    res.status(400);
+    throw new Error('Please provide productId, rating, and comment.');
+  }
 
+  if (rating < 1 || rating > 5) {
+    res.status(400);
+    throw new Error('Rating must be between 1 and 5.');
+  }
+
+  // Check if product exists
+  const product = await Product.findById(productId);
+
+  if (!product) {
+    res.status(404);
+    throw new Error('Product not found.');
+  }
+
+  // Check if the user has already reviewed the product
+  const existingReview = await Review.findOne({
+    user: req.user._id,
+    product: productId,
+  });
+
+  if (existingReview) {
+    // Update the existing review
+    existingReview.rating = rating;
+    existingReview.comment = comment;
+    await existingReview.save();
+    res.status(200).json({ success: true, message: 'Review updated successfully.' });
+  } else {
+    // Create a new review
     const review = await Review.create({
-      reviewId,
-      user,
-      product,
+      user: req.user._id,
+      product: productId,
+      name: req.user.name,
       rating,
       comment,
     });
-
-    res.status(201).json({
-      success: true,
-      data: review,
-    });
-  } catch (error) {
-    // Handle duplicate key error for reviewId
-    if (error.code === 11000) {
-      return res
-        .status(400)
-        .json({ success: false, message: 'Review ID already exists' });
-    }
-    res.status(500).json({ success: false, message: 'Server Error' });
+    res.status(201).json({ success: true, message: 'Review added successfully.' });
   }
-};
 
-// @desc    Update review
-// @route   PUT /api/reviews/:id
-// @access  Private/Admin
-const updateReview = async (req, res) => {
-  try {
-    let review = await Review.findById(req.params.id);
+  // Recalculate product ratings and number of reviews
+  await Product.calculateRatings(productId);
+});
 
-    if (!review) {
-      return res
-        .status(404)
-        .json({ success: false, message: 'Review not found' });
-    }
+// @desc    Get all reviews for a product
+// @route   GET /api/reviews/:productId
+// @access  Public
+const getProductReviews = asyncHandler(async (req, res) => {
+  const { productId } = req.params;
 
-    review = await Review.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+  // Check if product exists
+  const product = await Product.findById(productId);
 
-    res.status(200).json({
-      success: true,
-      data: review,
-    });
-  } catch (error) {
-    res.status(500).json({ success: false, message: 'Server Error' });
+  if (!product) {
+    res.status(404);
+    throw new Error('Product not found.');
   }
-};
 
-// @desc    Delete review
-// @route   DELETE /api/reviews/:id
-// @access  Private/Admin
-const deleteReview = async (req, res) => {
-  try {
-    const review = await Review.findById(req.params.id);
+  // Fetch all reviews for the product
+  const reviews = await Review.find({ product: productId }).populate('user', 'name email');
 
-    if (!review) {
-      return res
-        .status(404)
-        .json({ success: false, message: 'Review not found' });
-    }
+  res.status(200).json({ success: true, count: reviews.length, data: reviews });
+});
 
-    await review.remove();
+// @desc    Delete a review
+// @route   DELETE /api/reviews/:reviewId
+// @access  Private/User/Admin
+const deleteReview = asyncHandler(async (req, res) => {
+  const { reviewId } = req.params;
 
-    res.status(200).json({
-      success: true,
-      message: 'Review removed',
-    });
-  } catch (error) {
-    res.status(500).json({ success: false, message: 'Server Error' });
+  // Find the review
+  const review = await Review.findById(reviewId);
+
+  if (!review) {
+    res.status(404);
+    throw new Error('Review not found.');
   }
-};
 
-// Add query parameters handling in getReviews
+  // Check if the user is the owner of the review or an admin
+  if (review.user.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+    res.status(401);
+    throw new Error('Not authorized to delete this review.');
+  }
 
-// const getReviews = async (req, res) => {
-//   try {
-//     let query = Review.find();
+  // Get the associated product ID before deletion
+  const productId = review.product;
 
-//     // Filtering
-//     if (req.query.approved) {
-//       query = query.where('approved').equals(req.query.approved === 'true');
-//     }
+  // Delete the review
+  await review.remove();
 
-//     // Search by product name or user name
-//     if (req.query.search) {
-//       const searchTerm = req.query.search;
-//       query = query.find({
-//         $or: [
-//           { 'product.name': { $regex: searchTerm, $options: 'i' } },
-//           { 'user.name': { $regex: searchTerm, $options: 'i' } },
-//         ],
-//       });
-//     }
+  res.status(200).json({ success: true, message: 'Review deleted successfully.' });
 
-//     // Sorting
-//     if (req.query.sort) {
-//       const sortBy = req.query.sort.split(',').join(' ');
-//       query = query.sort(sortBy);
-//     } else {
-//       query = query.sort('-createdAt');
-//     }
-
-//     // Pagination
-//     const page = parseInt(req.query.page, 10) || 1;
-//     const limit = parseInt(req.query.limit, 10) || 25;
-//     const startIndex = (page - 1) * limit;
-//     const endIndex = page * limit;
-//     const total = await Review.countDocuments();
-
-//     query = query.skip(startIndex).limit(limit);
-
-//     const reviews = await query;
-
-//     // Pagination result
-//     const pagination = {};
-
-//     if (endIndex < total) {
-//       pagination.next = {
-//         page: page + 1,
-//         limit,
-//       };
-//     }
-
-//     if (startIndex > 0) {
-//       pagination.prev = {
-//         page: page - 1,
-//         limit,
-//       };
-//     }
-
-//     res.status(200).json({
-//       success: true,
-//       count: reviews.length,
-//       pagination,
-//       data: reviews,
-//     });
-//   } catch (error) {
-//     res.status(500).json({ success: false, message: 'Server Error' });
-//   }
-// };
-
+  // Recalculate product ratings and number of reviews
+  await Product.calculateRatings(productId);
+});
 
 module.exports = {
-  getReviews,
-  getReview,
-  createReview,
-  updateReview,
+  addOrUpdateReview,
+  getProductReviews,
   deleteReview,
 };

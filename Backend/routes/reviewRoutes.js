@@ -3,18 +3,20 @@
 const express = require('express');
 const router = express.Router();
 const {
-  getReviews,
-  getReview,
-  createReview,
-  updateReview,
+  addOrUpdateReview,
+  getProductReviews,
   deleteReview,
 } = require('../controllers/reviewController');
-const { protect } = require('../middleware/authMiddleware');
 
-// All routes are protected
-router.use(protect);
+const { protect, admin } = require('../middleware/authMiddleware');
 
-router.route('/').get(getReviews).post(createReview);
-router.route('/:id').get(getReview).put(updateReview).delete(deleteReview);
+// Route to add or update a review
+router.post('/', protect, addOrUpdateReview);
+
+// Route to get all reviews for a product
+router.get('/:productId', getProductReviews);
+
+// Route to delete a review
+router.delete('/:reviewId', protect, deleteReview);
 
 module.exports = router;
