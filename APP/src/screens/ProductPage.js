@@ -20,6 +20,8 @@ import { LinearGradient } from 'expo-linear-gradient'; // Import LinearGradient
 
 import { ThemeContext } from '../../ThemeContext';
 import { lightTheme, darkTheme } from '../../themes';
+import { CartContext } from '../contexts/CartContext'; // Corrected path
+
 
 const { width } = Dimensions.get('window');
 
@@ -30,6 +32,7 @@ const ProductPage = () => {
 
   const [isReviewPopupVisible, setReviewPopupVisible] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
+  const { cartItems, addToCart } = useContext(CartContext);
 
   // Get theme from context
   const { theme } = useContext(ThemeContext);
@@ -47,10 +50,15 @@ const ProductPage = () => {
     setIsFavorite(!isFavorite);
   };
 
-  const handleAddToCart = () => {
-    // Implement your add to cart functionality here
-    Alert.alert('Success', `${item.examName} has been added to your cart.`);
+  const handleAddToCart = (item) => {
+    const added = addToCart(item);
+    if (added) {
+      Alert.alert('Success', `${item.name} has been added to your cart.`);
+    } else {
+      Alert.alert('Info', `${item.name} is already in your cart.`);
+    }
   };
+
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: currentTheme.backgroundColor }]}>
@@ -78,7 +86,7 @@ const ProductPage = () => {
         {/* Header Title */}
         <View style={styles.headerTitleContainer}>
           <Text style={[styles.headerTitle, { color: currentTheme.headerTextColor }]}>
-            {item.examName}
+            {item.name}
           </Text>
           <Text style={[styles.headerSubtitle, { color: currentTheme.headerTextColor }]}>
             {item.subjectName} ({item.subjectCode})
@@ -108,7 +116,7 @@ const ProductPage = () => {
         {/* Product Details */}
         <View style={[styles.detailsContainer, { backgroundColor: currentTheme.cardBackground }]}>
           <Text style={[styles.productTitle, { color: currentTheme.cardTextColor }]}>
-            {item.examName}
+            {item.name}
           </Text>
           <Text style={[styles.productSubtitle, { color: currentTheme.textColor }]}>
             {item.subjectName} ({item.subjectCode})
@@ -148,7 +156,7 @@ const ProductPage = () => {
           {/* Add to Cart Button */}
           <TouchableOpacity
             style={[styles.addToCartButton, { backgroundColor: currentTheme.primaryColor }]}
-            onPress={handleAddToCart}
+            onPress={() => handleAddToCart(item)}
             accessibilityLabel="Add to Cart"
             accessibilityRole="button"
           >
@@ -297,5 +305,6 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
 });
+
 
 export default ProductPage;

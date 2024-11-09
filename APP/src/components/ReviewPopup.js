@@ -59,7 +59,7 @@ const ReviewPopup = ({ closePopup, productId }) => {
   // Render individual review item
   const renderReview = (review) => {
     return (
-      <View key={review.id} style={styles.reviewItem}>
+      <View key={review.id}  style={[styles.reviewItem, { backgroundColor: currentTheme.backgroundColor }]}>
         <View style={styles.reviewHeader}>
           <Image
             source={{ uri: review.avatar || placeholderAvatar }}
@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   reviewItem: {
-    backgroundColor: '#F5F5F5',
+    // backgroundColor: '#F5F5F5',
     borderRadius: 15,
     padding: 15,
     marginBottom: 15,

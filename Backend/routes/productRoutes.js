@@ -13,7 +13,7 @@ const {
 const { protect, authorize } = require('../middleware/authMiddleware');
 
 // Fetch all products/exams
-router.route('/').get(protect, authorize('admin'), fetchProducts).post(protect, authorize('admin'), addProduct);
+router.route('/').get( fetchProducts).post(protect, authorize('admin'), addProduct);
 
 // Update and delete specific product/exam by ID
 router.route('/:id').put(protect, authorize('admin'), updateProduct).delete(protect, authorize('admin'), deleteProduct);

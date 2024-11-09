@@ -39,7 +39,7 @@ export const CartProvider = ({ children }) => {
 
   // Function to add item to cart
   const addToCart = (item) => {
-    const exists = cartItems.some((cartItem) => cartItem.id === item.id);
+    const exists = cartItems.some((cartItem) => cartItem._id === item._id);
     if (!exists) {
       setCartItems([...cartItems, item]);
       return true; // Indicates item was added
@@ -49,7 +49,7 @@ export const CartProvider = ({ children }) => {
 
   // Function to remove item from cart
   const removeFromCart = (itemId) => {
-    setCartItems(cartItems.filter((cartItem) => cartItem.id !== itemId));
+    setCartItems(cartItems.filter((cartItem) => cartItem._id !== itemId));
   };
 
   // Function to clear the cart

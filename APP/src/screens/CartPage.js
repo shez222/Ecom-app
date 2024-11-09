@@ -65,7 +65,7 @@ const CartPage = () => {
         </View>
       </View>
       <TouchableOpacity
-        onPress={() => removeFromCart(item.id)}
+        onPress={() => removeFromCart(item._id)}
         accessibilityLabel={`Remove ${item.examName} from cart`}
         accessibilityRole="button"
       >

@@ -10,9 +10,9 @@ import {
 import {
   fetchOrders,
 } from '../redux/slices/ordersSlice';
-import {
-  fetchReviews,
-} from '../redux/slices/reviewsSlice';
+// import {
+//   fetchReviews,
+// } from '../redux/slices/reviewsSlice';
 import {
   BarChart,
   Bar,
