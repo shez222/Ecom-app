@@ -29,6 +29,8 @@ const getAuthToken = async () => {
  */
 const storeAuthToken = async (token) => {
   try {
+    console.log(token);
+    
     await AsyncStorage.setItem('token', token);
   } catch (error) {
     console.error('Error storing auth token:', error);
@@ -333,8 +335,11 @@ export const addOrUpdateReview = async (productId, rating, comment) => {
  */
 export const getProductReviewsAPI = async (productId) => {
   try {
-    const response = await axios.get(`${API_URL}/reviews/${productId}`);
-    return { success: true, data: response.data };
+    
+    const response = await axios.get(`${API_URL}/reviews/product/${productId}`);
+    console.log(response);
+
+    return response;
   } catch (error) {
     console.error('Get Product Reviews error:', error.response?.data?.message || error.message);
     return { success: false, message: error.response?.data?.message || 'Failed to fetch reviews.' };

@@ -127,15 +127,14 @@ const ProductPage = () => {
             {Array.from({ length: 5 }, (_, index) => (
               <Ionicons
                 key={index}
-                name={index < Math.floor(item.rating) ? 'star' : 'star-outline'}
+                name={index < Math.floor(item.ratings) ? 'star' : 'star-outline'}
                 size={20}
                 color="#FFD700"
               />
             ))}
             <TouchableOpacity onPress={openReviewPopup}>
               <Text style={[styles.reviewCount, { color: currentTheme.secondaryColor }]}>
-                {' '}
-                ({item.reviews} reviews)
+                ({item.numberOfReviews} reviews)
               </Text>
             </TouchableOpacity>
           </View>
@@ -172,7 +171,7 @@ const ProductPage = () => {
           onRequestClose={closeReviewPopup}
           transparent={true}
         >
-          <ReviewPopup closePopup={closeReviewPopup} productId={item.id} />
+          <ReviewPopup closePopup={closeReviewPopup} productId={item._id} />
         </Modal>
       </ScrollView>
     </SafeAreaView>

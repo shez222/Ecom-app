@@ -193,14 +193,14 @@ const MarketPage = () => {
               {Array.from({ length: 5 }, (_, index) => (
                 <Ionicons
                   key={index}
-                  name={index < Math.floor(item.rating) ? 'star' : 'star-outline'}
+                  name={index < Math.floor(item.ratings) ? 'star' : 'star-outline'}
                   size={16}
                   color="#FFD700"
                 />
               ))}
               <Text style={[styles.reviewCount, { color: currentTheme.textColor }]}>
                 {' '}
-                ({item.reviews})
+                ({item.numberOfReviews})
               </Text>
             </View>
             <Text style={[styles.cardPrice, { color: currentTheme.cardTextColor }]}>
