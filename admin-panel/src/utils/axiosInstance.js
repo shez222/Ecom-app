@@ -3,7 +3,7 @@ import axios from 'axios';
 
 // Create an Axios instance
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000', // Replace with your backend API
+  baseURL: import.meta.env.VITE_API_URL || 'https://ecom-app-orpin-ten.vercel.app', // Replace with your backend API
 });
 
 // Request interceptor to add the token to headers
