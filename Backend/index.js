@@ -11,6 +11,8 @@ const adminRoutes = require('./routes/authRoutes');
 const reviewRoutes = require('./routes/reviewRoutes')
 const userRoutes = require('./routes/userRoutes');
 const productRoutes = require('./routes/productRoutes');
+const orderRoutes = require('./routes/orderRoutes');
+// const stripe = require('stripe')('sk_test_51OXlAIAZK57wNYnQQluuPOe6YHwpKCs2dZfKLaEe7Ye67OObYR3Hes3i0Vjo1yp450mlVWQ9ufvWWYYymF1mc33R00GwSCgwFi');
 
 // Load environment variables
 dotenv.config();
@@ -37,11 +39,41 @@ app.get('/', (req, res) => {
   res.send('API is running...');
 })
 
+// app.post('/create-checkout-session', async (req, res) => {
+//   const { cartItems } = req.body; // Pass cart items from the frontend
+
+//   try {
+//     const line_items = cartItems.map(item => ({
+//       price_data: {
+//         currency: 'usd',
+//         product_data: {
+//           name: item.name,
+//           images: [item.image],
+//         },
+//         unit_amount: parseInt(item.price) * 100, // Convert price to cents
+//       },
+//       quantity: 1, // Adjust quantity as needed
+//     }));
+
+//     const session = await stripe.checkout.sessions.create({
+//       payment_method_types: ['card'],
+//       line_items,
+//       mode: 'payment',
+//       success_url: 'https://your-success-url.com',
+//       cancel_url: 'https://your-cancel-url.com',
+//     });
+
+//     res.json({ url: session.url });
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// });
 // Routes
 app.use('/api/auth', adminRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/products', productRoutes);
+app.use('/api/orders', orderRoutes);
 
 // Error handling middleware (should be last piece of middleware)
 app.use(errorHandler);

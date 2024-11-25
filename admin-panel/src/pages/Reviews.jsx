@@ -179,7 +179,13 @@ const Reviews = () => {
                       {review.product.name}
                     </td>
                     <td className="py-4 px-6 text-sm text-gray-800 dark:text-gray-200">
-                      {review.rating}
+                      <div className="flex items-center">
+                        {Array.from({ length: 5 }, (_, index) => (
+                          <span key={index} className="text-yellow-500">
+                            {index < Math.floor(review.rating) ? '★' : '☆'}
+                          </span>
+                        ))}
+                      </div>
                     </td>
                     <td className="py-4 px-6 text-sm text-gray-800 dark:text-gray-200">
                       {review.comment}
