@@ -24,9 +24,9 @@ const createPaymentIntent = asyncHandler(async (req, res) => {
       amount: Math.round(totalPrice * 100), // Amount in cents
       currency: 'usd', // Change to your currency
       payment_method_types: ['card'],
-      metadata: {
-        userId: req.user._id.toString(),
-      },
+      // metadata: {
+      //   userId: req.user._id.toString(),
+      // },
     });
 
     res.send({
