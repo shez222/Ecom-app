@@ -13,10 +13,10 @@ const createPaymentIntent = asyncHandler(async (req, res) => {
   const { orderItems, totalPrice } = req.body;
 
   // Validate order items
-  if (!orderItems || orderItems.length === 0) {
-    res.status(400);
-    throw new Error('No order items');
-  }
+  // if (!orderItems || orderItems.length === 0) {
+  //   res.status(400);
+  //   throw new Error('No order items');
+  // }
 
   try {
     // Create a PaymentIntent with the order amount and currency
