@@ -21,7 +21,7 @@ const createPaymentIntent = asyncHandler(async (req, res) => {
   try {
     // Create a PaymentIntent with the order amount and currency
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(totalPrice * 100), // Amount in cents
+      amount:totalPrice, // Amount in cents
       currency: 'usd', // Change to your currency
       payment_method_types: ['card'],
       // metadata: {
