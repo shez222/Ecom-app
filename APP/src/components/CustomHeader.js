@@ -26,7 +26,12 @@ const CustomHeader = ({ userProfileImage = DEFAULT_PROFILE_IMAGE, username = 'Jo
       end={[0, 0]}
     >
       {/* User Info */}
-      <View style={styles.userInfoContainer}>
+      <TouchableOpacity
+        style={styles.userInfoContainer}
+        onPress={() => navigation.navigate('UserProfileScreen')}
+        accessibilityLabel="Go to Profile"
+        accessibilityRole="button"
+      >
         <Image
           source={{ uri: userProfileImage }}
           style={[
@@ -41,22 +46,35 @@ const CustomHeader = ({ userProfileImage = DEFAULT_PROFILE_IMAGE, username = 'Jo
         <Text style={[styles.username, { color: currentTheme.headerTextColor }]}>
           {username}
         </Text>
-      </View>
-
-      {/* Go to Cart Button */}
-      <TouchableOpacity
-        style={styles.cartButton}
-        onPress={() => navigation.navigate('CartPage')}
-        accessibilityLabel="Go to Cart"
-        accessibilityRole="button"
-      >
-        <Ionicons name="cart-outline" size={24} color={currentTheme.headerTextColor} />
-        {cartItems.length > 0 && (
-          <View style={styles.cartBadge}>
-            <Text style={styles.cartBadgeText}>{cartItems.length}</Text>
-          </View>
-        )}
       </TouchableOpacity>
+
+      {/* Right Buttons */}
+      <View style={styles.rightButtonsContainer}>
+        {/* Cart Button */}
+        <TouchableOpacity
+          style={styles.iconButton}
+          onPress={() => navigation.navigate('CartPage')}
+          accessibilityLabel="Go to Cart"
+          accessibilityRole="button"
+        >
+          <Ionicons name="cart-outline" size={24} color={currentTheme.headerTextColor} />
+          {cartItems.length > 0 && (
+            <View style={styles.cartBadge}>
+              <Text style={styles.cartBadgeText}>{cartItems.length}</Text>
+            </View>
+          )}
+        </TouchableOpacity>
+
+        {/* Settings Button */}
+        <TouchableOpacity
+          style={styles.iconButton}
+          onPress={() => navigation.navigate('Settings')}
+          accessibilityLabel="Go to Settings"
+          accessibilityRole="button"
+        >
+          <Ionicons name="settings-outline" size={24} color={currentTheme.headerTextColor} />
+        </TouchableOpacity>
+      </View>
     </LinearGradient>
   );
 };
@@ -67,11 +85,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 15,
-    paddingVertical: Platform.OS === 'ios' ? 20 : 10, // Decreased padding for reduced height
+    paddingVertical: Platform.OS === 'ios' ? 20 : 15,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 1, // Reduced shadow height to match reduced header height
+      height: 1, 
     },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
@@ -83,29 +101,34 @@ const styles = StyleSheet.create({
   },
   username: {
     fontSize: 18,
-    marginRight: 10,
-    fontWeight: 'bold',
     marginLeft: 10,
+    fontWeight: 'bold',
   },
   profileImage: {
-    width: 40, // Reduced size for a more compact header
+    width: 40,
     height: 40,
     borderRadius: 20,
     borderWidth: 2,
     backgroundColor: '#ccc', // Placeholder background color
   },
-  cartButton: {
+  rightButtonsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  iconButton: {
+    paddingHorizontal: 5,
+    paddingVertical: 5,
+    marginLeft: 15,
     position: 'relative',
-    padding: 5, // Reduced padding to fit the smaller header
   },
   cartBadge: {
     position: 'absolute',
-    right: 0,
-    top: -5,
+    right: -2,
+    top: -2,
     backgroundColor: '#E53935',
-    width: 18,
-    height: 18,
-    borderRadius: 9,
+    width: 16,
+    height: 16,
+    borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
   },

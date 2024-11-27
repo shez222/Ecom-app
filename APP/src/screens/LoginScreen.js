@@ -6,10 +6,8 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  Alert,
   StyleSheet,
   Animated,
-  ImageBackground,
   KeyboardAvoidingView,
   Platform,
   Dimensions,
@@ -23,6 +21,9 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { ThemeContext } from '../../ThemeContext';
 import { lightTheme, darkTheme } from '../../themes';
 
+// Import the CustomAlert component
+import CustomAlert from '../components/CustomAlert';
+
 const { width, height } = Dimensions.get('window');
 
 const LoginScreen = () => {
@@ -33,6 +34,11 @@ const LoginScreen = () => {
   // Loading state
   const [loading, setLoading] = useState(false);
 
+  // State for controlling the CustomAlert
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertTitle, setAlertTitle] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
+
   // Get theme from context
   const { theme } = useContext(ThemeContext);
   const currentTheme = theme === 'light' ? lightTheme : darkTheme;
@@ -41,6 +47,9 @@ const LoginScreen = () => {
   const iconOpacity = useRef(new Animated.Value(0)).current;
   const iconTranslateY = useRef(new Animated.Value(-50)).current;
   const buttonScale = useRef(new Animated.Value(1)).current;
+
+  // Create a ref for password input
+  const passwordInputRef = useRef();
 
   // Function to start the animations
   const startAnimations = () => {
@@ -63,9 +72,10 @@ const LoginScreen = () => {
   }, []);
 
   const handleLogin = async () => {
-    // navigation.navigate('Main')
     if (!email || !password) {
-      Alert.alert('Validation Error', 'Please enter both email and password.');
+      setAlertTitle('Validation Error');
+      setAlertMessage('Please enter both email and password.');
+      setAlertVisible(true);
       return;
     }
 
@@ -75,11 +85,18 @@ const LoginScreen = () => {
     const response = await loginUser(email, password);
     setLoading(false);
 
-    if (response) {
+    if (response.success) {
       navigation.navigate('Main'); // Adjust as per your navigation structure
     } else {
-      Alert.alert('Login Failed', 'Invalid email or password.');
+      setAlertTitle('Login Failed');
+      setAlertMessage('Invalid email or password.');
+      setAlertVisible(true);
     }
+  };
+
+  // Function to handle closing the alert
+  const handleCloseAlert = () => {
+    setAlertVisible(false);
   };
 
   return (
@@ -106,7 +123,12 @@ const LoginScreen = () => {
             </Text>
           </Animated.View>
           <View style={styles.inputContainer}>
-            <View style={styles.inputWrapper}>
+            <View
+              style={[
+                styles.inputWrapper,
+                { backgroundColor: currentTheme.inputBackground },
+              ]}
+            >
               <Icon
                 name="email"
                 size={24}
@@ -120,7 +142,6 @@ const LoginScreen = () => {
                   styles.input,
                   {
                     color: currentTheme.textColor,
-                    backgroundColor: currentTheme.inputBackground,
                   },
                 ]}
                 onChangeText={setEmail}
@@ -134,7 +155,12 @@ const LoginScreen = () => {
                 blurOnSubmit={false}
               />
             </View>
-            <View style={styles.inputWrapper}>
+            <View
+              style={[
+                styles.inputWrapper,
+                { backgroundColor: currentTheme.inputBackground },
+              ]}
+            >
               <Icon
                 name="lock"
                 size={24}
@@ -149,7 +175,6 @@ const LoginScreen = () => {
                   styles.input,
                   {
                     color: currentTheme.textColor,
-                    backgroundColor: currentTheme.inputBackground,
                   },
                 ]}
                 secureTextEntry
@@ -214,14 +239,19 @@ const LoginScreen = () => {
               </Text>
             </TouchableOpacity>
           </View>
+          {/* CustomAlert Component */}
+          <CustomAlert
+            visible={alertVisible}
+            title={alertTitle}
+            message={alertMessage}
+            onClose={handleCloseAlert}
+            icon={alertTitle === 'Validation Error' ? 'alert-circle' : 'close-circle'}
+          />
         </View>
       </KeyboardAvoidingView>
     </LinearGradient>
   );
 };
-
-// Create a ref for password input
-const passwordInputRef = React.createRef();
 
 // Styles for the components
 const styles = StyleSheet.create({
@@ -255,7 +285,6 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     borderWidth: 1,
     borderColor: '#d9d9d9',
-    backgroundColor: '#ffffff',
     paddingHorizontal: 15,
   },
   inputIcon: {
@@ -286,7 +315,7 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
-    marginTop:10
+    marginTop: 10,
   },
   buttonText: {
     color: '#FFFFFF',

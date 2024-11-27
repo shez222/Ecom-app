@@ -1,6 +1,6 @@
-// UserProfileScreen.js
+// src/screens/UserProfileScreen.js
 
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   View,
   Text,
@@ -17,18 +17,33 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 import { ThemeContext } from '../../ThemeContext';
 import { lightTheme, darkTheme } from '../../themes';
+import EditProfilePopup from '../components/EditProfilePopup';
+import CustomAlert from '../components/CustomAlert'; // Import CustomAlert
 
 const { width } = Dimensions.get('window');
 
 const UserProfileScreen = () => {
-  const user = {
+  const [user, setUser] = useState({
     name: 'John Doe',
     email: 'john.doe@example.com',
+    phone: '+1 (555) 123-4567',
+    address: '123 Main St, Anytown, USA',
     profileImage:
       'https://images.pexels.com/photos/697509/pexels-photo-697509.jpeg',
     coverImage:
       'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg',
-  };
+    favoritesCount: 5,
+    reviewsCount: 8,
+  });
+
+  const [isEditProfileVisible, setEditProfileVisible] = useState(false);
+
+  // State for controlling the CustomAlert
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertTitle, setAlertTitle] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertIcon, setAlertIcon] = useState('');
+  const [alertButtons, setAlertButtons] = useState([]);
 
   const { theme } = useContext(ThemeContext);
   const currentTheme = theme === 'light' ? lightTheme : darkTheme;
@@ -36,16 +51,27 @@ const UserProfileScreen = () => {
   const navigation = useNavigation();
 
   const handleEditProfile = () => {
-    // Navigate to Edit Profile screen or open modal
-    navigation.navigate('EditProfile'); // Ensure 'EditProfile' is defined in your navigation stack
+    setEditProfileVisible(true);
   };
 
-  // Handler for back button press
+  const handleSaveProfile = (updatedData) => {
+    setUser(updatedData);
+    setAlertTitle('Profile Updated');
+    setAlertMessage('Your profile has been updated successfully.');
+    setAlertIcon('checkmark-circle');
+    setAlertButtons([
+      {
+        text: 'OK',
+        onPress: () => setAlertVisible(false),
+      },
+    ]);
+    setAlertVisible(true);
+  };
+
   const handleGoBack = () => {
     navigation.goBack();
   };
 
-  // Helper function to render info items
   const renderInfoItem = (iconName, text) => (
     <View style={styles.infoItem}>
       <Ionicons
@@ -60,7 +86,6 @@ const UserProfileScreen = () => {
     </View>
   );
 
-  // Helper function to render setting items
   const renderSettingItem = (iconName, text, onPress) => (
     <TouchableOpacity
       style={styles.settingItem}
@@ -91,7 +116,7 @@ const UserProfileScreen = () => {
       style={[styles.container, { backgroundColor: currentTheme.backgroundColor }]}
       contentContainerStyle={{ paddingBottom: 30 }}
     >
-      {/* Header Section with Cover Image and Back Button */}
+      {/* Header Section with Cover Image */}
       <View style={styles.headerContainer}>
         <Image
           source={{ uri: user.coverImage }}
@@ -99,15 +124,10 @@ const UserProfileScreen = () => {
           resizeMode="cover"
           accessibilityLabel={`${user.name}'s cover image`}
         />
-        {/* Back Button */}
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={handleGoBack}
-          accessibilityLabel="Go Back"
-          accessibilityRole="button"
-        >
-          <Ionicons name="arrow-back" size={24} color={currentTheme.headerTextColor} />
-        </TouchableOpacity>
+        <LinearGradient
+          colors={['rgba(0,0,0,0.5)', 'transparent']}
+          style={styles.coverGradient}
+        />
       </View>
 
       {/* User Profile Info */}
@@ -130,7 +150,7 @@ const UserProfileScreen = () => {
           {user.email}
         </Text>
         <TouchableOpacity
-          style={styles.editButton}
+          style={[styles.editButton, { backgroundColor: currentTheme.primaryColor }]}
           onPress={handleEditProfile}
           accessibilityLabel="Edit Profile"
           accessibilityRole="button"
@@ -152,7 +172,7 @@ const UserProfileScreen = () => {
         </View>
         <View style={styles.statItem}>
           <Text style={[styles.statNumber, { color: currentTheme.primaryColor }]}>
-            5
+            {user.favoritesCount || 0}
           </Text>
           <Text style={[styles.statLabel, { color: currentTheme.textColor }]}>
             Favorites
@@ -160,7 +180,7 @@ const UserProfileScreen = () => {
         </View>
         <View style={styles.statItem}>
           <Text style={[styles.statNumber, { color: currentTheme.primaryColor }]}>
-            8
+            {user.reviewsCount || 0}
           </Text>
           <Text style={[styles.statLabel, { color: currentTheme.textColor }]}>
             Reviews
@@ -173,8 +193,8 @@ const UserProfileScreen = () => {
         <Text style={[styles.sectionTitle, { color: currentTheme.cardTextColor }]}>
           Personal Information
         </Text>
-        {renderInfoItem('call', '+1 (555) 123-4567')}
-        {renderInfoItem('location', '123 Main St, Anytown, USA')}
+        {renderInfoItem('call', user.phone)}
+        {renderInfoItem('location', user.address)}
       </View>
 
       {/* Account Settings Section */}
@@ -183,14 +203,30 @@ const UserProfileScreen = () => {
           Account Settings
         </Text>
         {renderSettingItem('key', 'Change Password', () => {
-          // Navigate to Change Password screen or open modal
-          navigation.navigate('ChangePassword'); // Ensure 'ChangePassword' is defined in your navigation stack
+          navigation.navigate('ChangePassword');
         })}
         {renderSettingItem('notifications', 'Notification Settings', () => {
-          // Navigate to Notification Settings screen or toggle settings
-          navigation.navigate('NotificationSettings'); // Ensure 'NotificationSettings' is defined in your navigation stack
+          navigation.navigate('NotificationSettings');
         })}
       </View>
+
+      {/* Edit Profile Popup */}
+      <EditProfilePopup
+        visible={isEditProfileVisible}
+        onClose={() => setEditProfileVisible(false)}
+        userData={user}
+        onSave={handleSaveProfile}
+      />
+
+      {/* CustomAlert Component */}
+      <CustomAlert
+        visible={alertVisible}
+        title={alertTitle}
+        message={alertMessage}
+        icon={alertIcon}
+        onClose={() => setAlertVisible(false)}
+        buttons={alertButtons}
+      />
     </ScrollView>
   );
 };
@@ -209,19 +245,20 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
+  coverGradient: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+  },
   backButton: {
     position: 'absolute',
-    top: Platform.OS === 'ios' ? 50 : 30, // Adjust for status bar
+    top: Platform.OS === 'ios' ? 50 : 30,
     left: 20,
     padding: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    // Optional: Increase touchable area
-    // You can wrap Ionicons in a View with padding if needed
   },
   userInfoContainer: {
     alignItems: 'center',
-    marginTop: -60, // To overlap the profile image on the cover image
+    marginTop: -60,
     paddingHorizontal: 20,
   },
   profileImage: {
@@ -231,14 +268,14 @@ const styles = StyleSheet.create({
     borderWidth: 4,
     borderColor: '#FFFFFF',
     marginBottom: 10,
-    backgroundColor: '#ccc', // Placeholder background color
+    backgroundColor: '#ccc',
   },
   userName: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 26,
+    fontWeight: '700',
   },
   userEmail: {
-    fontSize: 16,
+    fontSize: 18,
     color: '#6c757d',
     marginBottom: 10,
   },
@@ -267,11 +304,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   statNumber: {
-    fontSize: 22,
-    fontWeight: 'bold',
+    fontSize: 24,
+    fontWeight: '700',
   },
   statLabel: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#6c757d',
   },
   section: {
@@ -279,8 +316,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 22,
+    fontWeight: '700',
     marginBottom: 10,
   },
   infoItem: {
@@ -300,6 +337,9 @@ const styles = StyleSheet.create({
   infoIcon: {
     marginRight: 15,
   },
+  infoText: {
+    fontSize: 16,
+  },
   chevronIcon: {
     marginLeft: 'auto',
   },
@@ -316,9 +356,17 @@ export default UserProfileScreen;
 
 
 
-// // UserProfileScreen.js
 
-// import React, { useContext } from 'react';
+
+
+
+
+
+
+
+// // src/screens/UserProfileScreen.js
+
+// import React, { useContext, useState } from 'react';
 // import {
 //   View,
 //   Text,
@@ -326,49 +374,152 @@ export default UserProfileScreen;
 //   TouchableOpacity,
 //   StyleSheet,
 //   ScrollView,
+//   Platform,
+//   Dimensions,
+//   Alert,
 // } from 'react-native';
 // import { Ionicons } from '@expo/vector-icons';
+// import { useNavigation } from '@react-navigation/native';
 // import { LinearGradient } from 'expo-linear-gradient';
 
 // import { ThemeContext } from '../../ThemeContext';
 // import { lightTheme, darkTheme } from '../../themes';
+// import EditProfilePopup from '../components/EditProfilePopup';
+
+// const { width } = Dimensions.get('window');
 
 // const UserProfileScreen = () => {
-//   const user = {
+//   const [user, setUser] = useState({
 //     name: 'John Doe',
 //     email: 'john.doe@example.com',
+//     phone: '+1 (555) 123-4567',
+//     address: '123 Main St, Anytown, USA',
 //     profileImage:
 //       'https://images.pexels.com/photos/697509/pexels-photo-697509.jpeg',
-//   };
+//     coverImage:
+//       'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg',
+//     favoritesCount: 5,
+//     reviewsCount: 8,
+//   });
+
+//   const [isEditProfileVisible, setEditProfileVisible] = useState(false);
 
 //   const { theme } = useContext(ThemeContext);
 //   const currentTheme = theme === 'light' ? lightTheme : darkTheme;
 
+//   const navigation = useNavigation();
+
 //   const handleEditProfile = () => {
-//     // Navigate to Edit Profile screen or open modal
+//     setEditProfileVisible(true);
 //   };
+
+//   const handleSaveProfile = (updatedData) => {
+//     setUser(updatedData);
+//     Alert.alert('Profile Updated', 'Your profile has been updated successfully.');
+//   };
+
+//   const handleGoBack = () => {
+//     navigation.goBack();
+//   };
+
+//   const renderInfoItem = (iconName, text) => (
+//     <View style={styles.infoItem}>
+//       <Ionicons
+//         name={iconName}
+//         size={20}
+//         color={currentTheme.primaryColor}
+//         style={styles.infoIcon}
+//       />
+//       <Text style={[styles.infoText, { color: currentTheme.textColor }]}>
+//         {text}
+//       </Text>
+//     </View>
+//   );
+
+//   const renderSettingItem = (iconName, text, onPress) => (
+//     <TouchableOpacity
+//       style={styles.settingItem}
+//       onPress={onPress}
+//       accessibilityLabel={text}
+//       accessibilityRole="button"
+//     >
+//       <Ionicons
+//         name={iconName}
+//         size={20}
+//         color={currentTheme.primaryColor}
+//         style={styles.infoIcon}
+//       />
+//       <Text style={[styles.infoText, { color: currentTheme.textColor }]}>
+//         {text}
+//       </Text>
+//       <Ionicons
+//         name="chevron-forward"
+//         size={20}
+//         color={currentTheme.placeholderTextColor}
+//         style={styles.chevronIcon}
+//       />
+//     </TouchableOpacity>
+//   );
 
 //   return (
 //     <ScrollView
 //       style={[styles.container, { backgroundColor: currentTheme.backgroundColor }]}
+//       contentContainerStyle={{ paddingBottom: 30 }}
 //     >
-//       <LinearGradient
-//         colors={currentTheme.headerBackground}
-//         style={styles.profileHeader}
-//       >
-//         <Image source={{ uri: user.profileImage }} style={styles.profileImage} />
-//         <Text style={[styles.userName, { color: currentTheme.headerTextColor }]}>
+//       {/* Header Section with Cover Image and Back Button */}
+//       <View style={styles.headerContainer}>
+//         <Image
+//           source={{ uri: user.coverImage }}
+//           style={styles.coverImage}
+//           resizeMode="cover"
+//           accessibilityLabel={`${user.name}'s cover image`}
+//         />
+//         <LinearGradient
+//           colors={['rgba(0,0,0,0.5)', 'transparent']}
+//           style={styles.coverGradient}
+//         />
+//         {/* Back Button */}
+//         {/* <TouchableOpacity
+//           style={styles.backButton}
+//           onPress={handleGoBack}
+//           accessibilityLabel="Go Back"
+//           accessibilityRole="button"
+//         >
+//           <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+//         </TouchableOpacity> */}
+//       </View>
+
+//       {/* User Profile Info */}
+//       <View style={styles.userInfoContainer}>
+//         <Image
+//           source={{ uri: user.profileImage }}
+//           style={[
+//             styles.profileImage,
+//             { borderColor: currentTheme.borderColor },
+//           ]}
+//           accessibilityLabel={`${user.name}'s profile picture`}
+//           onError={(e) => {
+//             console.log(`Failed to load profile image for ${user.name}:`, e.nativeEvent.error);
+//           }}
+//         />
+//         <Text style={[styles.userName, { color: currentTheme.textColor }]}>
 //           {user.name}
 //         </Text>
-//         <Text style={[styles.userEmail, { color: currentTheme.headerTextColor }]}>
+//         <Text style={[styles.userEmail, { color: currentTheme.textColor }]}>
 //           {user.email}
 //         </Text>
-//         <TouchableOpacity style={styles.editButton} onPress={handleEditProfile}>
+//         <TouchableOpacity
+//           style={[styles.editButton, { backgroundColor: currentTheme.primaryColor }]}
+//           onPress={handleEditProfile}
+//           accessibilityLabel="Edit Profile"
+//           accessibilityRole="button"
+//         >
 //           <Ionicons name="pencil" size={20} color="#FFFFFF" />
 //           <Text style={styles.editButtonText}>Edit Profile</Text>
 //         </TouchableOpacity>
-//       </LinearGradient>
+//       </View>
 
+//       {/* Statistics Section */}
 //       <View style={styles.statsContainer}>
 //         <View style={styles.statItem}>
 //           <Text style={[styles.statNumber, { color: currentTheme.primaryColor }]}>
@@ -380,7 +531,7 @@ export default UserProfileScreen;
 //         </View>
 //         <View style={styles.statItem}>
 //           <Text style={[styles.statNumber, { color: currentTheme.primaryColor }]}>
-//             5
+//             {user.favoritesCount || 0}
 //           </Text>
 //           <Text style={[styles.statLabel, { color: currentTheme.textColor }]}>
 //             Favorites
@@ -388,7 +539,7 @@ export default UserProfileScreen;
 //         </View>
 //         <View style={styles.statItem}>
 //           <Text style={[styles.statNumber, { color: currentTheme.primaryColor }]}>
-//             8
+//             {user.reviewsCount || 0}
 //           </Text>
 //           <Text style={[styles.statLabel, { color: currentTheme.textColor }]}>
 //             Reviews
@@ -396,76 +547,68 @@ export default UserProfileScreen;
 //         </View>
 //       </View>
 
+//       {/* Personal Information Section */}
 //       <View style={styles.section}>
 //         <Text style={[styles.sectionTitle, { color: currentTheme.cardTextColor }]}>
 //           Personal Information
 //         </Text>
-//         <View style={styles.infoItem}>
-//           <Ionicons
-//             name="call"
-//             size={20}
-//             color={currentTheme.primaryColor}
-//             style={styles.infoIcon}
-//           />
-//           <Text style={[styles.infoText, { color: currentTheme.textColor }]}>
-//             +1 (555) 123-4567
-//           </Text>
-//         </View>
-//         <View style={styles.infoItem}>
-//           <Ionicons
-//             name="location"
-//             size={20}
-//             color={currentTheme.primaryColor}
-//             style={styles.infoIcon}
-//           />
-//           <Text style={[styles.infoText, { color: currentTheme.textColor }]}>
-//             123 Main St, Anytown, USA
-//           </Text>
-//         </View>
+//         {renderInfoItem('call', user.phone)}
+//         {renderInfoItem('location', user.address)}
 //       </View>
 
+//       {/* Account Settings Section */}
 //       <View style={styles.section}>
 //         <Text style={[styles.sectionTitle, { color: currentTheme.cardTextColor }]}>
 //           Account Settings
 //         </Text>
-//         <TouchableOpacity style={styles.settingItem}>
-//           <Ionicons
-//             name="key"
-//             size={20}
-//             color={currentTheme.primaryColor}
-//             style={styles.infoIcon}
-//           />
-//           <Text style={[styles.infoText, { color: currentTheme.textColor }]}>
-//             Change Password
-//           </Text>
-//         </TouchableOpacity>
-//         <TouchableOpacity style={styles.settingItem}>
-//           <Ionicons
-//             name="notifications"
-//             size={20}
-//             color={currentTheme.primaryColor}
-//             style={styles.infoIcon}
-//           />
-//           <Text style={[styles.infoText, { color: currentTheme.textColor }]}>
-//             Notification Settings
-//           </Text>
-//         </TouchableOpacity>
+//         {renderSettingItem('key', 'Change Password', () => {
+//           navigation.navigate('ChangePassword');
+//         })}
+//         {renderSettingItem('notifications', 'Notification Settings', () => {
+//           navigation.navigate('NotificationSettings');
+//         })}
 //       </View>
+
+//       {/* Edit Profile Popup */}
+//       <EditProfilePopup
+//         visible={isEditProfileVisible}
+//         onClose={() => setEditProfileVisible(false)}
+//         userData={user}
+//         onSave={handleSaveProfile}
+//       />
 //     </ScrollView>
 //   );
 // };
 
+// // Styles for the components
 // const styles = StyleSheet.create({
 //   container: {
 //     flex: 1,
 //   },
-//   profileHeader: {
-//     paddingBottom: 20,
-//     paddingTop: 40,
+//   headerContainer: {
+//     position: 'relative',
+//     width: '100%',
+//     height: 200,
+//   },
+//   coverImage: {
+//     width: '100%',
+//     height: '100%',
+//   },
+//   coverGradient: {
+//     position: 'absolute',
+//     width: '100%',
+//     height: '100%',
+//   },
+//   backButton: {
+//     position: 'absolute',
+//     top: Platform.OS === 'ios' ? 50 : 30,
+//     left: 20,
+//     padding: 8,
+//   },
+//   userInfoContainer: {
 //     alignItems: 'center',
-//     borderBottomLeftRadius: 20,
-//     borderBottomRightRadius: 20,
-//     marginBottom: 20,
+//     marginTop: -60,
+//     paddingHorizontal: 20,
 //   },
 //   profileImage: {
 //     width: 120,
@@ -474,13 +617,15 @@ export default UserProfileScreen;
 //     borderWidth: 4,
 //     borderColor: '#FFFFFF',
 //     marginBottom: 10,
+//     backgroundColor: '#ccc',
 //   },
 //   userName: {
-//     fontSize: 24,
-//     fontWeight: 'bold',
+//     fontSize: 26,
+//     fontWeight: '700',
 //   },
 //   userEmail: {
-//     fontSize: 16,
+//     fontSize: 18,
+//     color: '#6c757d',
 //     marginBottom: 10,
 //   },
 //   editButton: {
@@ -496,40 +641,47 @@ export default UserProfileScreen;
 //     color: '#FFFFFF',
 //     fontSize: 16,
 //     marginLeft: 5,
+//     fontWeight: '600',
 //   },
 //   statsContainer: {
 //     flexDirection: 'row',
 //     justifyContent: 'space-around',
-//     marginBottom: 20,
+//     marginVertical: 20,
+//     paddingHorizontal: 20,
 //   },
 //   statItem: {
 //     alignItems: 'center',
 //   },
 //   statNumber: {
-//     fontSize: 22,
-//     fontWeight: 'bold',
+//     fontSize: 24,
+//     fontWeight: '700',
 //   },
 //   statLabel: {
-//     fontSize: 14,
+//     fontSize: 16,
+//     color: '#6c757d',
 //   },
 //   section: {
 //     paddingHorizontal: 20,
 //     marginBottom: 20,
 //   },
 //   sectionTitle: {
-//     fontSize: 20,
-//     fontWeight: 'bold',
+//     fontSize: 22,
+//     fontWeight: '700',
 //     marginBottom: 10,
 //   },
 //   infoItem: {
 //     flexDirection: 'row',
 //     alignItems: 'center',
-//     paddingVertical: 10,
+//     paddingVertical: 12,
+//     borderBottomWidth: 1,
+//     borderBottomColor: '#dee2e6',
 //   },
 //   settingItem: {
 //     flexDirection: 'row',
 //     alignItems: 'center',
-//     paddingVertical: 10,
+//     paddingVertical: 12,
+//     borderBottomWidth: 1,
+//     borderBottomColor: '#dee2e6',
 //   },
 //   infoIcon: {
 //     marginRight: 15,
@@ -537,6 +689,17 @@ export default UserProfileScreen;
 //   infoText: {
 //     fontSize: 16,
 //   },
+//   chevronIcon: {
+//     marginLeft: 'auto',
+//   },
 // });
 
 // export default UserProfileScreen;
+
+
+
+
+
+
+
+

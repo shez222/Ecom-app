@@ -1,6 +1,7 @@
 // src/navigation/AppNavigator.js
 
 import React, { useContext } from 'react';
+import { View, Text, StyleSheet } from 'react-native'; // Import necessary components
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
@@ -18,39 +19,98 @@ import HelpScreen from '../screens/HelpScreen';
 import ProductPage from '../screens/ProductPage';
 import CartPage from '../screens/CartPage';
 import NewPasswordScreen from '../screens/NewPasswordScreen';
+import FavouritesPage from '../screens/FavouritesPage';
 
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 
 import { ThemeProvider, ThemeContext } from '../../ThemeContext';
 import { lightTheme, darkTheme } from '../../themes';
 
+import { FavouritesContext, FavouritesProvider } from '../contexts/FavouritesContext'; // Import FavouritesContext and Provider
+
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
+// Create Stack Navigators for tabs
+const MarketStack = createStackNavigator();
+const FavouritesStack = createStackNavigator();
+// Create other stack navigators as needed
+
+const MarketStackScreen = () => (
+  <MarketStack.Navigator screenOptions={{ headerShown: false }}>
+    <MarketStack.Screen name="Market" component={MarketPage} />
+    <MarketStack.Screen name="ProductPage" component={ProductPage} />
+    <MarketStack.Screen name="CartPage" component={CartPage} />
+    <MarketStack.Screen name="Settings" component={SettingsScreen} />
+    {/* Add other screens as needed */}
+  </MarketStack.Navigator>
+);
+
+const FavouritesStackScreen = () => (
+  <FavouritesStack.Navigator screenOptions={{ headerShown: false }}>
+    <FavouritesStack.Screen name="Favourites" component={FavouritesPage} />
+    <FavouritesStack.Screen name="ProductPage" component={ProductPage} />
+    <FavouritesStack.Screen name="CartPage" component={CartPage} />
+    <FavouritesStack.Screen name="Settings" component={SettingsScreen} />
+    {/* Add other screens as needed */}
+  </FavouritesStack.Navigator>
+);
+
+// Define the Tab Navigator
 const MainTabNavigator = () => {
   const { theme } = useContext(ThemeContext);
+  const { favouriteItems } = useContext(FavouritesContext); // Access favouriteItems
+
   const currentTheme = theme === 'light' ? lightTheme : darkTheme;
+
+  const styles = StyleSheet.create({
+    badge: {
+      position: 'absolute',
+      right: -6,
+      top: -3,
+      backgroundColor: currentTheme.priceColor, // Use theme color
+      borderRadius: 8,
+      width: 16,
+      height: 16,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    badgeText: {
+      color: '#FFFFFF',
+      fontSize: 10,
+      fontWeight: 'bold',
+    },
+  });
 
   return (
     <Tab.Navigator
+      initialRouteName="Market"
       screenOptions={({ route }) => ({
-        // Remove all headers from the Tab Navigator
         headerShown: false,
-
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
 
-          if (route.name === 'Market') {
-            iconName = focused ? 'storefront' : 'storefront-outline';
-            return <Ionicons name={iconName} size={size} color={color} />;
+          if (route.name === 'Favourites') {
+            iconName = focused ? 'heart' : 'heart-outline';
+
+            return (
+              <View style={{ width: 24, height: 24, margin: 5 }}>
+                <Ionicons name={iconName} size={size} color={color} />
+                {favouriteItems.length > 0 && (
+                  <View style={styles.badge}>
+                    <Text style={styles.badgeText}>{favouriteItems.length}</Text>
+                  </View>
+                )}
+              </View>
+            );
           } else if (route.name === 'PurchaseHistory') {
             iconName = focused ? 'history' : 'history';
             return <MaterialIcons name={iconName} size={size} color={color} />;
+          } else if (route.name === 'Market') {
+            iconName = focused ? 'storefront' : 'storefront-outline';
+            return <Ionicons name={iconName} size={size} color={color} />;
           } else if (route.name === 'UserProfile') {
             iconName = focused ? 'person' : 'person-outline';
-            return <Ionicons name={iconName} size={size} color={color} />;
-          } else if (route.name === 'Settings') {
-            iconName = focused ? 'settings' : 'settings-outline';
             return <Ionicons name={iconName} size={size} color={color} />;
           } else if (route.name === 'Help') {
             iconName = focused ? 'help-circle' : 'help-circle-outline';
@@ -64,55 +124,44 @@ const MainTabNavigator = () => {
         },
       })}
     >
-      <Tab.Screen name="Market" component={MarketPage} />
+      <Tab.Screen name="Favourites" component={FavouritesStackScreen} />
       <Tab.Screen name="PurchaseHistory" component={PurchaseHistoryScreen} />
+      <Tab.Screen name="Market" component={MarketStackScreen} />
       <Tab.Screen name="UserProfile" component={UserProfileScreen} />
-      <Tab.Screen name="Settings" component={SettingsScreen} />
       <Tab.Screen name="Help" component={HelpScreen} />
     </Tab.Navigator>
   );
 };
 
 const AppNavigator = () => {
-  // Example user data; replace with actual user data as needed
-  const userProfileImage =
-    'https://images.pexels.com/photos/697509/pexels-photo-697509.jpeg';
-  const username = 'John Doe'; // Replace with actual username from your user data
-
   return (
     <ThemeProvider>
-      <NavigationContainer>
-        <Stack.Navigator
-          initialRouteName="Login"
-          // Remove all headers globally
-          screenOptions={{ headerShown: false }}
-        >
-          {/* Authentication Screens */}
-          <Stack.Screen name="Login" component={LoginScreen} />
-          <Stack.Screen name="Register" component={RegisterScreen} />
-          <Stack.Screen
-            name="ForgotPassword"
-            component={ForgotPasswordScreen}
-          />
-          <Stack.Screen name="Otp" component={OtpScreen} />
-          <Stack.Screen name="NewPassword" component={NewPasswordScreen} />
+      <FavouritesProvider> {/* Wrap with FavouritesProvider */}
+        <NavigationContainer>
+          <Stack.Navigator
+            initialRouteName="Login"
+            screenOptions={{ headerShown: false }}
+          >
+            {/* Authentication Screens */}
+            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="Register" component={RegisterScreen} />
+            <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+            <Stack.Screen name="Otp" component={OtpScreen} />
+            <Stack.Screen name="NewPassword" component={NewPasswordScreen} />
 
-          {/* Main App Screens with Bottom Tab Navigator */}
-          <Stack.Screen name="Main" component={MainTabNavigator} />
+            {/* Main App Screens with Bottom Tab Navigator */}
+            <Stack.Screen name="Main" component={MainTabNavigator} />
 
-          {/* Product Page */}
-          <Stack.Screen name="ProductPage" component={ProductPage} />
-
-          {/* Cart Page */}
-          <Stack.Screen name="CartPage" component={CartPage} />
-        </Stack.Navigator>
-      </NavigationContainer>
+            {/* Other Screens that should not show the bottom tab bar */}
+            {/* Remove SettingsScreen from here */}
+          </Stack.Navigator>
+        </NavigationContainer>
+      </FavouritesProvider>
     </ThemeProvider>
   );
 };
 
 export default AppNavigator;
-
 
 
 

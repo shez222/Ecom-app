@@ -12,6 +12,9 @@ const fs = require('fs');
 // @access  Public
 const registerUser = async (req, res) => {
   const { name, email, password, role } = req.body;
+console.log("check1");
+console.log(name, email, password, role);
+
 
   try {
     // Check if user exists
@@ -22,6 +25,7 @@ const registerUser = async (req, res) => {
         .status(400)
         .json({ success: false, message: 'User already exists' });
     }
+console.log("check2");
 
     // Create user
     user = await User.create({
@@ -30,9 +34,12 @@ const registerUser = async (req, res) => {
       password,
       role
     });
-
+    console.log("check3");
+    
     sendTokenResponse(user, 200, res);
   } catch (error) {
+    console.log(error);
+    
     res.status(500).json({ success: false, message: 'Server Error' });
   }
 };

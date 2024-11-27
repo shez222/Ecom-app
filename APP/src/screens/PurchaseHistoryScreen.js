@@ -283,7 +283,7 @@ const PurchaseHistoryScreen = () => {
         end={[0, 1]}
       >
         {/* Back Button with Animation */}
-        <TouchableWithoutFeedback
+        {/* <TouchableWithoutFeedback
           onPressIn={handlePressIn}
           onPressOut={handlePressOut}
           accessibilityLabel="Go Back"
@@ -300,7 +300,7 @@ const PurchaseHistoryScreen = () => {
           >
             <AnimatedIonicons name="arrow-back" size={24} color={colorInterpolate} />
           </Animated.View>
-        </TouchableWithoutFeedback>
+        </TouchableWithoutFeedback> */}
 
         {/* Title */}
         <Text style={[styles.title, { color: currentTheme.headerTextColor }]}>
@@ -430,6 +430,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center', // Added this line
     paddingVertical: 15,
     paddingHorizontal: 15,
   },
@@ -443,6 +444,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
+    textAlign: 'center',
   },
   listContent: {
     paddingHorizontal: 20,

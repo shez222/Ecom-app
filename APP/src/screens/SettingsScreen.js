@@ -64,49 +64,49 @@ const SettingsScreen = () => {
   const AnimatedIonicons = Animated.createAnimatedComponent(Ionicons);
 
   // Animation handlers for the back button
-  const handlePressIn = () => {
-    // Animate to pressed state
-    Animated.parallel([
-      Animated.spring(scaleAnim, {
-        toValue: 0.9,
-        friction: 4,
-        useNativeDriver: true,
-      }),
-      Animated.timing(rotateAnim, {
-        toValue: 1,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-      Animated.timing(colorAnim, {
-        toValue: 1,
-        duration: 200,
-        useNativeDriver: false, // Color interpolation doesn't support native driver
-      }),
-    ]).start();
-  };
+  // const handlePressIn = () => {
+  //   // Animate to pressed state
+  //   Animated.parallel([
+  //     Animated.spring(scaleAnim, {
+  //       toValue: 0.9,
+  //       friction: 4,
+  //       useNativeDriver: true,
+  //     }),
+  //     Animated.timing(rotateAnim, {
+  //       toValue: 1,
+  //       duration: 200,
+  //       useNativeDriver: true,
+  //     }),
+  //     Animated.timing(colorAnim, {
+  //       toValue: 1,
+  //       duration: 200,
+  //       useNativeDriver: false, // Color interpolation doesn't support native driver
+  //     }),
+  //   ]).start();
+  // };
 
-  const handlePressOut = () => {
-    // Animate back to original state and navigate back
-    Animated.parallel([
-      Animated.spring(scaleAnim, {
-        toValue: 1,
-        friction: 4,
-        useNativeDriver: true,
-      }),
-      Animated.timing(rotateAnim, {
-        toValue: 0,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-      Animated.timing(colorAnim, {
-        toValue: 0,
-        duration: 200,
-        useNativeDriver: false,
-      }),
-    ]).start(() => {
-      navigation.goBack();
-    });
-  };
+  // const handlePressOut = () => {
+  //   // Animate back to original state and navigate back
+  //   Animated.parallel([
+  //     Animated.spring(scaleAnim, {
+  //       toValue: 1,
+  //       friction: 4,
+  //       useNativeDriver: true,
+  //     }),
+  //     Animated.timing(rotateAnim, {
+  //       toValue: 0,
+  //       duration: 200,
+  //       useNativeDriver: true,
+  //     }),
+  //     Animated.timing(colorAnim, {
+  //       toValue: 0,
+  //       duration: 200,
+  //       useNativeDriver: false,
+  //     }),
+  //   ]).start(() => {
+  //     navigation.goBack();
+  //   });
+  // };
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: currentTheme.backgroundColor }]}>
@@ -122,9 +122,18 @@ const SettingsScreen = () => {
           end={[0, 1]} // Horizontal gradient; adjust as needed
         >
           {/* Animated Back Button */}
-          <TouchableWithoutFeedback
-            onPressIn={handlePressIn}
-            onPressOut={handlePressOut}
+          <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+          accessibilityLabel="Go Back"
+          accessibilityRole="button"
+        >
+          <Ionicons name="arrow-back" size={24} color={currentTheme.headerTextColor} />
+        </TouchableOpacity>
+          {/* <TouchableWithoutFeedback
+          onPress={handlePressOut}
+            // onPressIn={handlePressIn}
+            // onPressOut={handlePressOut}
             accessibilityLabel="Go Back"
             accessibilityRole="button"
           >
@@ -138,7 +147,7 @@ const SettingsScreen = () => {
             >
               <AnimatedIonicons name="arrow-back" size={24} color={colorInterpolate} />
             </Animated.View>
-          </TouchableWithoutFeedback>
+          </TouchableWithoutFeedback> */}
 
           {/* Header Title */}
           <Text style={[styles.headerTitle, { color: currentTheme.headerTextColor }]}>

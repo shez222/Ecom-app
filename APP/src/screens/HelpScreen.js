@@ -122,7 +122,7 @@ const HelpScreen = () => {
           end={[0, 1]} // Horizontal gradient; adjust as needed
         >
           {/* Animated Back Button */}
-          <TouchableWithoutFeedback
+          {/* <TouchableWithoutFeedback
             onPressIn={handlePressIn}
             onPressOut={handlePressOut}
             accessibilityLabel="Go Back"
@@ -138,7 +138,7 @@ const HelpScreen = () => {
             >
               <AnimatedIonicons name="arrow-back" size={24} color={colorInterpolate} />
             </Animated.View>
-          </TouchableWithoutFeedback>
+          </TouchableWithoutFeedback> */}
 
           {/* Header Title */}
           <Text style={[styles.headerTitle, { color: currentTheme.headerTextColor }]}>
