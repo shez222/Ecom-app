@@ -11,7 +11,7 @@ const {
 const { protect } = require('../middleware/authMiddleware');
 
 // Create Payment Intent
-router.post('/create-payment-intent', createPaymentIntent);
+router.post('/create-payment-intent', protect, createPaymentIntent);
 
 // Create a new order
 router.post('/', protect, addOrderItems);

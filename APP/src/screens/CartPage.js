@@ -41,9 +41,9 @@
 //     .reduce((sum, item) => sum + parseFloat(item.price), 0)
 //     .toFixed(2);
 
-//   // Stripe hook
-//   const { initPaymentSheet, presentPaymentSheet } = useStripe();
-//   const [loading, setLoading] = useState(false);
+  // // Stripe hook
+  // const { initPaymentSheet, presentPaymentSheet } = useStripe();
+  // const [loading, setLoading] = useState(false);
 
 //   // Hide the default header provided by React Navigation
 //   useEffect(() => {
@@ -52,42 +52,42 @@
 //     });
 //   }, [navigation]);
 
-//   // Fetch Payment Intent client secret from backend
-//   const fetchPaymentIntent = async () => {
-//     try {
-//       const response = await fetch('http://localhost:5000/api/orders/create-payment-intent', { // Replace with your backend URL
-//         method: 'POST',
-//         headers: {
-//           'Content-Type': 'application/json',
-//         },
-//         body: JSON.stringify({
-//           amount: parseInt(totalPrice) * 100, // Convert to cents
-//         }),
-//       });
+  // // Fetch Payment Intent client secret from backend
+  // const fetchPaymentIntent = async () => {
+  //   try {
+  //     const response = await fetch('http://10.0.2.2:5000/api/orders/create-payment-intent', { // Replace with your backend URL
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({
+  //         totalPrice: parseInt(totalPrice) * 100, // Convert to cents
+  //       }),
+  //     });
 
-//       const { clientSecret } = await response.json();
-//       return clientSecret;
-//     } catch (error) {
-//       console.error('Error fetching payment intent:', error);
-//       Alert.alert('Error', 'Failed to initiate payment.');
-//       return null;
-//     }
-//   };
+  //     const { clientSecret } = await response.json();
+  //     return clientSecret;
+  //   } catch (error) {
+  //     console.error('Error fetching payment intent:', error);
+  //     Alert.alert('Error', 'Failed to initiate payment.');
+  //     return null;
+  //   }
+  // };
 
 //   const handleCheckout = async () => {
 //     setLoading(true);
 
-//     // const clientSecret = await fetchPaymentIntent();
-//     // console.log(clientSecret);
+//     const clientSecret = await fetchPaymentIntent();
+//     console.log(clientSecret);
     
 
-//     // if (!clientSecret) {
-//     //   setLoading(false);
-//     //   return;
-//     // }
+//     if (!clientSecret) {
+//       setLoading(false);
+//       return;
+//     }
 
 //     const { error: initError } = await initPaymentSheet({
-//       paymentIntentClientSecret: "pi_3QPcY5AZK57wNYnQ3uPZVbop_secret_X2Mxj7W2yCZSHqZb1MK85bepR",
+//       paymentIntentClientSecret: clientSecret,
 //       merchantDisplayName: 'Your App Name', // Replace with your app or business name
 //     });
 
@@ -194,28 +194,28 @@
 //       />
 
 //       {/* Total and Checkout */}
-//       {cartItems.length > 0 && (
-//         <View style={[styles.footer, { borderTopColor: currentTheme.borderColor }]}>
-//           <Text style={[styles.totalText, { color: currentTheme.textColor }]}>
-//             Total: <Text style={{ color: currentTheme.priceColor }}>${totalPrice}</Text>
-//           </Text>
-//           <TouchableOpacity
-//             style={[
-//               styles.checkoutButton,
-//               { backgroundColor: currentTheme.primaryColor },
-//               loading && styles.disabledButton, // Disable button when loading
-//             ]}
-//             onPress={handleCheckout}
-//             accessibilityLabel="Proceed to Checkout"
-//             accessibilityRole="button"
-//             disabled={loading} // Disable button when loading
-//           >
-//             <Text style={[styles.checkoutButtonText, { color: '#FFFFFF' }]}>
-//               {loading ? 'Processing...' : 'Checkout'}
-//             </Text>
-//           </TouchableOpacity>
-//         </View>
-//       )}
+      // {cartItems.length > 0 && (
+      //   <View style={[styles.footer, { borderTopColor: currentTheme.borderColor }]}>
+      //     <Text style={[styles.totalText, { color: currentTheme.textColor }]}>
+      //       Total: <Text style={{ color: currentTheme.priceColor }}>${totalPrice}</Text>
+      //     </Text>
+      //     <TouchableOpacity
+      //       style={[
+      //         styles.checkoutButton,
+      //         { backgroundColor: currentTheme.primaryColor },
+      //         loading && styles.disabledButton, // Disable button when loading
+      //       ]}
+      //       onPress={handleCheckout}
+      //       accessibilityLabel="Proceed to Checkout"
+      //       accessibilityRole="button"
+      //       disabled={loading} // Disable button when loading
+      //     >
+      //       <Text style={[styles.checkoutButtonText, { color: '#FFFFFF' }]}>
+      //         {loading ? 'Processing...' : 'Checkout'}
+      //       </Text>
+      //     </TouchableOpacity>
+      //   </View>
+      // )}
 //     </SafeAreaView>
 //   );
 // };
@@ -752,6 +752,7 @@ import {
   Dimensions,
   StatusBar,
   SafeAreaView,
+  Alert
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -762,6 +763,8 @@ import { ThemeContext } from '../../ThemeContext';
 import { lightTheme, darkTheme } from '../../themes';
 import { CartContext } from '../contexts/CartContext';
 import CustomAlert from '../components/CustomAlert'; // Import CustomAlert
+import { useStripe } from '@stripe/stripe-react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width, height } = Dimensions.get('window');
 
@@ -774,6 +777,10 @@ const CartPage = () => {
 
   // Access cart context
   const { cartItems, removeFromCart, clearCart } = useContext(CartContext);
+
+    // Stripe hook
+    const { initPaymentSheet, presentPaymentSheet } = useStripe();
+    const [loading, setLoading] = useState(false);
 
   // Calculate total price
   const totalPrice = cartItems
@@ -821,88 +828,147 @@ const CartPage = () => {
       </TouchableOpacity>
     </View>
   );
+//   // Fetch Payment Intent client secret from backend
+  const fetchPaymentIntent = async () => {
+    try {
+      const response = await fetch('http://10.0.2.2:5000/api/orders/create-payment-intent', { // Replace with your backend URL
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+           'Authorization': `Bearer ${await AsyncStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          totalPrice: parseInt(totalPrice) * 100, // Convert to cents
+        }),
+      });
+
+      const { clientSecret } = await response.json();
+      return clientSecret;
+    } catch (error) {
+      console.error('Error fetching payment intent:', error);
+      Alert.alert('Error', 'Failed to initiate payment.');
+      return null;
+    }
+  };
 
   const handleCheckout = async () => {
-    if (cartItems.length === 0) {
-      setAlertTitle('Cart Empty');
-      setAlertMessage('Your cart is empty. Add items before checkout.');
-      setAlertIcon('cart-outline');
-      setAlertButtons([
-        {
-          text: 'OK',
-          onPress: () => setAlertVisible(false),
-        },
-      ]);
-      setAlertVisible(true);
+    setLoading(true);
+
+    const clientSecret = await fetchPaymentIntent();
+    console.log(clientSecret);
+    
+
+    if (!clientSecret) {
+      setLoading(false);
       return;
     }
 
-    try {
-      const orderData = {
-        orderItems: cartItems.map((item) => ({
-          product: item._id,
-          examName: item.examName,
-          subjectName: item.subjectName,
-          subjectCode: item.subjectCode,
-          price: item.price,
-          image: item.image,
-          quantity: 1, // Assuming quantity is 1; modify as needed
-        })),
-        totalPrice: parseFloat(totalPrice),
-        paymentMethod: 'Cash', // Modify based on actual payment method
-        isPaid: true, // Since you want to mark it as completed
-        paidAt: new Date(),
-        paymentResult: {
-          // Include payment details if applicable
-          // For cash, this can be minimal or omitted
-        },
-      };
+    const { error: initError } = await initPaymentSheet({
+      paymentIntentClientSecret: clientSecret,
+      merchantDisplayName: 'Your App Name', // Replace with your app or business name
+    });
 
-      const response = await api.createOrder(orderData);
+    if (initError) {
+      console.error('Error initializing payment sheet:', initError);
+      Alert.alert('Error', initError.message);
+      setLoading(false);
+      return;
+    }
 
-      if (response.success && response.data) {
-        // Access the pdfLink for each product in the response
-        const createdOrder = response.data;
+    const { error: paymentError } = await presentPaymentSheet();
 
-        // Example: Logging pdfLinks
-        createdOrder.orderItems.forEach((orderItem) => {
-          console.log(`PDF Link for ${orderItem.examName}: ${orderItem.product.pdfLink}`);
-          // You can now use orderItem.product.pdfLink as needed
-        });
-
-        setAlertTitle('Order Placed');
-        setAlertMessage('Your order has been placed successfully!');
-        setAlertIcon('checkmark-circle');
+    if (paymentError) {
+      Alert.alert('Payment Failed', paymentError.message);
+    } else {
+      if (cartItems.length === 0) {
+        setAlertTitle('Cart Empty');
+        setAlertMessage('Your cart is empty. Add items before checkout.');
+        setAlertIcon('cart-outline');
         setAlertButtons([
           {
             text: 'OK',
-            onPress: () => {
-              setAlertVisible(false);
-              clearCart();
-              navigation.navigate('MarketPage'); // Adjust navigation as needed
-            },
+            onPress: () => setAlertVisible(false),
           },
         ]);
         setAlertVisible(true);
-      } else {
-        throw new Error(response.message || 'Failed to place order');
+        return;
       }
-    } catch (error) {
-      console.error('Checkout Error:', error);
-      setAlertTitle('Checkout Failed');
-      setAlertMessage(
-        error.message || 'An error occurred during checkout. Please try again.'
-      );
-      setAlertIcon('close-circle');
-      setAlertButtons([
-        {
-          text: 'OK',
-          onPress: () => setAlertVisible(false),
-        },
-      ]);
-      setAlertVisible(true);
+  
+      try {
+        const orderData = {
+          orderItems: cartItems.map((item) => ({
+            product: item._id,
+            examName: item.examName,
+            subjectName: item.subjectName,
+            subjectCode: item.subjectCode,
+            price: item.price,
+            image: item.image,
+            quantity: 1, // Assuming quantity is 1; modify as needed
+          })),
+          totalPrice: parseFloat(totalPrice),
+          paymentMethod: 'Cash', // Modify based on actual payment method
+          isPaid: true, // Since you want to mark it as completed
+          paidAt: new Date(),
+          paymentResult: {
+            // Include payment details if applicable
+            // For cash, this can be minimal or omitted
+          },
+        };
+  
+        const response = await api.createOrder(orderData);
+  
+        if (response.success && response.data) {
+          // Access the pdfLink for each product in the response
+          const createdOrder = response.data;
+  
+          // Example: Logging pdfLinks
+          createdOrder.orderItems.forEach((orderItem) => {
+            console.log(`PDF Link for ${orderItem.examName}: ${orderItem.product.pdfLink}`);
+            // You can now use orderItem.product.pdfLink as needed
+          });
+  
+          setAlertTitle('Order Placed');
+          setAlertMessage('Your order has been placed successfully!');
+          setAlertIcon('checkmark-circle');
+          setAlertButtons([
+            {
+              text: 'OK',
+              onPress: () => {
+                setAlertVisible(false);
+                clearCart();
+                navigation.goBack(); // Adjust navigation as needed
+              },
+            },
+          ]);
+          setAlertVisible(true);
+        } else {
+          throw new Error(response.message || 'Failed to place order');
+        }
+      } catch (error) {
+        console.error('Checkout Error:', error);
+        setAlertTitle('Checkout Failed');
+        setAlertMessage(
+          error.message || 'An error occurred during checkout. Please try again.'
+        );
+        setAlertIcon('close-circle');
+        setAlertButtons([
+          {
+            text: 'OK',
+            onPress: () => setAlertVisible(false),
+          },
+        ]);
+        setAlertVisible(true);
+      }
+      // Alert.alert('Payment Successful', 'Your payment was successful!');
+      // clearCart(); // Clear cart after successful payment
+      // navigation.navigate('MarketPage'); // Adjust navigation as needed
     }
+
+    setLoading(false);
   };
+  // const handleCheckout = async () => {
+    
+  // };
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: currentTheme.backgroundColor }]}>
@@ -965,13 +1031,18 @@ const CartPage = () => {
             Total: <Text style={{ color: currentTheme.priceColor }}>${totalPrice}</Text>
           </Text>
           <TouchableOpacity
-            style={[styles.checkoutButton, { backgroundColor: currentTheme.primaryColor }]}
-            onPress={handleCheckout}
+            style={[
+              styles.checkoutButton,
+              { backgroundColor: currentTheme.primaryColor },
+              loading && styles.disabledButton, // Disable button when loading
+            ]}
+            onPress={()=> handleCheckout()}
             accessibilityLabel="Proceed to Checkout"
             accessibilityRole="button"
+            disabled={loading} // Disable button when loading
           >
             <Text style={[styles.checkoutButtonText, { color: '#FFFFFF' }]}>
-              Checkout
+              {loading ? 'Processing...' : 'Checkout'}
             </Text>
           </TouchableOpacity>
         </View>

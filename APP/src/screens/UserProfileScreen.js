@@ -334,12 +334,12 @@ const UserProfileScreen = () => {
         <Text style={[styles.sectionTitle, { color: currentTheme.cardTextColor }]}>
           Account Settings
         </Text>
-        {renderSettingItem('key', 'Change Password', () => {
+        {/* {renderSettingItem('key', 'Change Password', () => {
           navigation.navigate('ChangePassword'); // Ensure this route exists
         })}
         {renderSettingItem('notifications', 'Notification Settings', () => {
           navigation.navigate('NotificationSettings'); // Ensure this route exists
-        })}
+        })} */}
       </View>
 
       {/* Edit Profile Popup */}

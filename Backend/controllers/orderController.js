@@ -24,10 +24,12 @@ console.log( totalPrice);
     const paymentIntent = await stripe.paymentIntents.create({
       amount:totalPrice, // Amount in cents
       currency: 'usd', // Change to your currency
-      payment_method_types: ['card'],
-      // metadata: {
-      //   userId: req.user._id.toString(),
-      // },
+      automatic_payment_methods: {
+        enabled: true,
+      },
+      metadata: {
+        userId: req.user._id.toString(),
+      },
     });
 
     res.send({

@@ -49,6 +49,8 @@ console.log("check2");
 // @access  Public
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
+  console.log(email);
+  
 
   // Validate email & password
   if (!email || !password) {
@@ -60,6 +62,7 @@ const loginUser = async (req, res) => {
   try {
     // Check for user
     const user = await User.findOne({ email }).select('+password');
+console.log(user);
 
     if (!user) {
       return res

@@ -306,7 +306,7 @@ const ProductHistoryPage = () => {
                   accessibilityLabel={`View PDF for ${orderItem.examName}`}
                   accessibilityRole="button"
                 >
-                  <Ionicons name="eye-outline" size={24} color={currentTheme.primaryColor} />
+                  <Ionicons name="eye-outline" size={24} color={currentTheme.cardTextColor} />
                 </TouchableOpacity>
                 {/* Download PDF Icon */}
                 <TouchableOpacity
@@ -315,7 +315,7 @@ const ProductHistoryPage = () => {
                   accessibilityLabel={`Download PDF for ${orderItem.examName}`}
                   accessibilityRole="button"
                 >
-                  <Ionicons name="download-outline" size={24} color={currentTheme.primaryColor} />
+                  <Ionicons name="download-outline" size={24} color={currentTheme.cardTextColor} />
                 </TouchableOpacity>
               </View>
             </View>
@@ -324,13 +324,13 @@ const ProductHistoryPage = () => {
       />
       {/* View Receipt Button */}
       <TouchableOpacity
-        style={styles.viewReceiptButton}
+        style={[styles.viewReceiptButton,{borderColor:currentTheme.backgroundHeaderColor}]}
         onPress={() => openReceiptModal(item)}
         accessibilityLabel="View Receipt"
         accessibilityRole="button"
       >
-        <Ionicons name="receipt-outline" size={20} color={currentTheme.primaryColor} />
-        <Text style={[styles.viewReceiptText, { color: currentTheme.primaryColor }]}>
+        <Ionicons name="receipt-outline" size={20} color={currentTheme.cardTextColor} />
+        <Text style={[styles.viewReceiptText, { color: currentTheme.cardTextColor }]}>
           View Receipt
         </Text>
       </TouchableOpacity>
@@ -668,7 +668,7 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: '#2196F3',
+    // borderColor: '#2196F3',
     borderRadius: 8,
   },
   viewReceiptText: {
