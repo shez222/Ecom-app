@@ -55,6 +55,8 @@ const addOrderItems = asyncHandler(async (req, res) => {
     paymentResult,
   } = req.body;
 
+  console.log('Order Items:', orderItems);
+
   if (!orderItems || orderItems.length === 0) {
     res.status(400);
     throw new Error('No order items');
@@ -69,11 +71,21 @@ const addOrderItems = asyncHandler(async (req, res) => {
     isPaid,
     paidAt,
     paymentResult,
+    status: 'completed', // Set status to 'completed'
   });
-
+  if (order) {
+    // Increment the user's purchasesCount
+    await req.user.incrementPurchases();
+  }
   const createdOrder = await order.save();
 
-  res.status(201).json(createdOrder);
+  // Populate the 'product' field in orderItems to include 'pdfLink'
+  const populatedOrder = await createdOrder.populate({
+    path: 'orderItems.product',
+    select: 'pdfLink', // Select the pdfLink field
+  });
+
+  res.status(201).json(populatedOrder);
 });
 
 /**
@@ -82,7 +94,12 @@ const addOrderItems = asyncHandler(async (req, res) => {
  * @access  Private
  */
 const getMyOrders = asyncHandler(async (req, res) => {
-  const orders = await Order.find({ user: req.user._id }).sort({ createdAt: -1 });
+  const orders = await Order.find({ user: req.user._id })
+    .populate({
+      path: 'orderItems.product',
+      select: 'pdfLink', // Include pdfLink in each orderItem's product
+    })
+    .sort({ createdAt: -1 });
   res.json(orders);
 });
 
@@ -94,6 +111,10 @@ const getMyOrders = asyncHandler(async (req, res) => {
 const getAllOrders = asyncHandler(async (req, res) => {
   const orders = await Order.find()
     .populate('user', 'id name email')
+    .populate({
+      path: 'orderItems.product',
+      select: 'pdfLink', // Include pdfLink in each orderItem's product
+    })
     .sort({ createdAt: -1 });
   res.json(orders);
 });

@@ -15,7 +15,9 @@ const getUsers = asyncHandler(async (req, res) => {
 // @route   GET /api/users/:id
 // @access  Private/Admin
 const getUser = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.params.id).select('-password');
+  console.log("sahdja");
+  
+  const user = await User.findById(req.user._id).select('-password');
 
   if (!user) {
     res.status(404);
@@ -67,9 +69,10 @@ const createUser = asyncHandler(async (req, res) => {
 // @route   PUT /api/users/:id
 // @access  Private/Admin
 const updateUser = asyncHandler(async (req, res) => {
-  const { name, email, role, password } = req.body;
-
-  let user = await User.findById(req.params.id);
+  const { name, email, role, password,profileImage,coverImage,phone,address } = req.body;
+  console.log(profileImage,coverImage,phone,address);
+  
+  let user = await User.findById(req.user._id);
 
   if (!user) {
     res.status(404);
@@ -78,12 +81,18 @@ const updateUser = asyncHandler(async (req, res) => {
 
   user.name = name || user.name;
   user.email = email || user.email;
-  user.role = role || user.role;
-  if (password) {
-    user.password = password;
-  }
+  user.profileImage = profileImage 
+  user.coverImage = coverImage 
+  user.phone = phone 
+  user.address = address 
+
+  // if (password) {
+  //   user.password = password;
+  // }
 
   const updatedUser = await user.save();
+  console.log(updatedUser);
+  
 
   res.status(200).json({
     success: true,
@@ -92,6 +101,10 @@ const updateUser = asyncHandler(async (req, res) => {
       name: updatedUser.name,
       email: updatedUser.email,
       role: updatedUser.role,
+      profileImage:updatedUser.profileImage,
+      coverImage:updatedUser.coverImage,
+      phone:updatedUser.phone,
+      address:updatedUser.address,
       createdAt: updatedUser.createdAt,
     },
   });

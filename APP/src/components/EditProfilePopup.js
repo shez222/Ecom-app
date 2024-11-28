@@ -1,6 +1,6 @@
 // src/components/EditProfilePopup.js
 
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import {
   View,
   Text,
@@ -26,6 +26,13 @@ const EditProfilePopup = ({ visible, onClose, userData, onSave }) => {
   // Access the current theme
   const { theme } = useContext(ThemeContext);
   const currentTheme = theme === 'light' ? lightTheme : darkTheme;
+
+  useEffect(() => {
+    setName(userData.name || '');
+    setEmail(userData.email || '');
+    setPhone(userData.phone || '');
+    setAddress(userData.address || '');
+  }, [userData]);
 
   const handleSave = () => {
     // Perform validation if needed
@@ -121,9 +128,12 @@ const EditProfilePopup = ({ visible, onClose, userData, onSave }) => {
             <View style={styles.inputContainer}>
               <Text style={[styles.label, { color: currentTheme.textColor }]}>Address</Text>
               <TextInput
-                style={[styles.input, { height: 80, backgroundColor: currentTheme.backgroundColor,
+                style={[styles.input, {
+                  height: 80,
+                  backgroundColor: currentTheme.backgroundColor,
                   color: currentTheme.textColor,
-                  borderColor: currentTheme.borderColor, }]}
+                  borderColor: currentTheme.borderColor,
+                }]}
                 value={address}
                 onChangeText={setAddress}
                 placeholder="Enter your address"
@@ -135,7 +145,7 @@ const EditProfilePopup = ({ visible, onClose, userData, onSave }) => {
             </View>
             <TouchableOpacity
               style={[styles.saveButton, { backgroundColor: currentTheme.primaryColor }]}
-              onPress={handleSave}
+              onPress={(handleSave)}
               accessibilityLabel="Save Profile"
               accessibilityRole="button"
             >

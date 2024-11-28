@@ -193,7 +193,7 @@ const RegisterScreen = () => {
           text: 'OK',
           onPress: () => {
             setAlertVisible(false);
-            navigation.navigate('Login');
+            navigation.navigate('Main');
           },
         },
       ]);

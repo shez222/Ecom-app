@@ -45,7 +45,10 @@ const createReview = asyncHandler(async (req, res) => {
     rating: Number(rating),
     comment,
   });
-
+  if (review) {
+    // Increment the user's reviewsCount
+    await req.user.incrementReviews();
+  }
   await review.save();
 
   // Recalculate product ratings and number of reviews
@@ -154,6 +157,8 @@ const deleteReview = asyncHandler(async (req, res) => {
 
   // Delete the review
   await review.deleteOne();
+  // Decrement the user's reviewsCount
+  await review.user.decrementReviews();
 
   // Recalculate product ratings and number of reviews
   await Product.calculateRatings(productId);
