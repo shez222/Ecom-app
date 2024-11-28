@@ -967,6 +967,89 @@ const CartPage = () => {
     setLoading(false);
   };
   // const handleCheckout = async () => {
+  //   if (cartItems.length === 0) {
+  //     setAlertTitle('Cart Empty');
+  //     setAlertMessage('Your cart is empty. Add items before checkout.');
+  //     setAlertIcon('cart-outline');
+  //     setAlertButtons([
+  //       {
+  //         text: 'OK',
+  //         onPress: () => setAlertVisible(false),
+  //       },
+  //     ]);
+  //     setAlertVisible(true);
+  //     return;
+  //   }
+
+  //   try {
+  //     const orderData = {
+  //       orderItems: cartItems.map((item) => ({
+  //         product: item._id,
+  //         examName: item.examName,
+  //         subjectName: item.subjectName,
+  //         subjectCode: item.subjectCode,
+  //         price: item.price,
+  //         image: item.image,
+  //         quantity: 1, // Assuming quantity is 1; modify as needed
+  //       })),
+  //       totalPrice: parseFloat(totalPrice),
+  //       paymentMethod: 'Cash', // Modify based on actual payment method
+  //       isPaid: true, // Since you want to mark it as completed
+  //       paidAt: new Date(),
+  //       paymentResult: {
+  //         // Include payment details if applicable
+  //         // For cash, this can be minimal or omitted
+  //       },
+  //     };
+
+  //     const response = await api.createOrder(orderData);
+
+  //     if (response.success && response.data) {
+  //       // Access the pdfLink for each product in the response
+  //       const createdOrder = response.data;
+
+  //       // Example: Logging pdfLinks
+  //       createdOrder.orderItems.forEach((orderItem) => {
+  //         console.log(`PDF Link for ${orderItem.examName}: ${orderItem.product.pdfLink}`);
+  //         // You can now use orderItem.product.pdfLink as needed
+  //       });
+
+  //       setAlertTitle('Order Placed');
+  //       setAlertMessage('Your order has been placed successfully!');
+  //       setAlertIcon('checkmark-circle');
+  //       setAlertButtons([
+  //         {
+  //           text: 'OK',
+  //           onPress: () => {
+  //             setAlertVisible(false);
+  //             clearCart();
+  //             navigation.goBack(); // Adjust navigation as needed
+  //           },
+  //         },
+  //       ]);
+  //       setAlertVisible(true);
+  //     } else {
+  //       throw new Error(response.message || 'Failed to place order');
+  //     }
+  //   } catch (error) {
+  //     console.error('Checkout Error:', error);
+  //     setAlertTitle('Checkout Failed');
+  //     setAlertMessage(
+  //       error.message || 'An error occurred during checkout. Please try again.'
+  //     );
+  //     setAlertIcon('close-circle');
+  //     setAlertButtons([
+  //       {
+  //         text: 'OK',
+  //         onPress: () => setAlertVisible(false),
+  //       },
+  //     ]);
+  //     setAlertVisible(true);
+  //   }
+  //   // Alert.alert('Payment Successful', 'Your payment was successful!');
+  //   // clearCart(); // Clear cart after successful payment
+  //   // navigation.navigate('MarketPage'); // Adjust navigation as needed
+  // }
     
   // };
 
