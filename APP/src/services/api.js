@@ -4,7 +4,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Replace with your actual API URL
-const API_URL = 'http://10.0.2.2:5000/api';
+const API_URL = 'http://localhost:5000/api';
 
 // ----------------------- Helper Functions ----------------------- //
 
@@ -155,7 +155,7 @@ export const getUserProfile = async () => {
       },
     };
 
-    const response = await axios.get(`${API_URL}/users/123`, config);
+    const response = await axios.get(`${API_URL}/users/me`, config);
     return { success: true, data: response.data };
   } catch (error) {
     console.error('Get User Profile error:', error.response?.data?.message || error.message);
@@ -182,7 +182,7 @@ export const updateUserProfile = async (updatedData) => {
       },
     };
 
-    const response = await axios.put(`${API_URL}/users/123`, updatedData, config);
+    const response = await axios.put(`${API_URL}/users/me`, updatedData, config);
     return { success: true, data: response.data };
   } catch (error) {
     console.error('Update User Profile error:', error.response?.data?.message || error.message);

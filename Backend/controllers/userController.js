@@ -15,9 +15,7 @@ const getUsers = asyncHandler(async (req, res) => {
 // @route   GET /api/users/:id
 // @access  Private/Admin
 const getUser = asyncHandler(async (req, res) => {
-  console.log("sahdja");
-  
-  const user = await User.findById(req.user._id).select('-password');
+  const user = await User.findById(req.params.id).select('-password');
 
   if (!user) {
     res.status(404);
@@ -69,6 +67,69 @@ const createUser = asyncHandler(async (req, res) => {
 // @route   PUT /api/users/:id
 // @access  Private/Admin
 const updateUser = asyncHandler(async (req, res) => {
+  const { name, email, role, password } = req.body;
+
+  let user = await User.findById(req.params.id);
+
+  if (!user) {
+    res.status(404);
+    throw new Error('User not found');
+  }
+
+  user.name = name || user.name;
+  user.email = email || user.email;
+  user.role = role || user.role;
+  if (password) {
+    user.password = password;
+  }
+
+  const updatedUser = await user.save();
+
+  res.status(200).json({
+    success: true,
+    data: {
+      _id: updatedUser._id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      role: updatedUser.role,
+      createdAt: updatedUser.createdAt,
+    },
+  });
+});
+
+// @desc    Delete user
+// @route   DELETE /api/users/:id
+// @access  Private/Admin
+const deleteUser = asyncHandler(async (req, res) => {
+  const userId = req.params.id; // Extract the user ID from route parameters
+  const user = await User.findByIdAndDelete(userId);
+
+  console.log(`Deleting user with ID: ${userId}`); // Enhanced log message
+
+  if (!user) {
+    res.status(404);
+    throw new Error('User not found');
+  }
+
+  // Include the deleted user ID within a 'data' property
+  res.status(200).json({ success: true, message: 'User removed', data: { _id: userId } });
+});
+
+
+
+// @desc    Get current logged in user
+// @route   GET /api/users/me
+// @access  Private
+const getMe = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user.id).select('-password');
+
+  res.status(200).json({ success: true, data: user });
+});
+
+// @desc    Update logged in user details
+// @route   PUT /api/users/me
+// @access  Private
+const updateMe = asyncHandler(async (req, res) => {
   const { name, email, role, password,profileImage,coverImage,phone,address } = req.body;
   console.log(profileImage,coverImage,phone,address);
   
@@ -110,68 +171,6 @@ const updateUser = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Delete user
-// @route   DELETE /api/users/:id
-// @access  Private/Admin
-const deleteUser = asyncHandler(async (req, res) => {
-  const userId = req.params.id; // Extract the user ID from route parameters
-  const user = await User.findByIdAndDelete(userId);
-
-  console.log(`Deleting user with ID: ${userId}`); // Enhanced log message
-
-  if (!user) {
-    res.status(404);
-    throw new Error('User not found');
-  }
-
-  // Include the deleted user ID within a 'data' property
-  res.status(200).json({ success: true, message: 'User removed', data: { _id: userId } });
-});
-
-
-
-// @desc    Get current logged in user
-// @route   GET /api/users/me
-// @access  Private
-const getMe = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user.id).select('-password');
-
-  res.status(200).json({ success: true, data: user });
-});
-
-// @desc    Update logged in user details
-// @route   PUT /api/users/me
-// @access  Private
-const updateMe = asyncHandler(async (req, res) => {
-  const { name, email, password } = req.body;
-
-  const user = await User.findById(req.user.id).select('+password');
-
-  if (!user) {
-    res.status(404);
-    throw new Error('User not found');
-  }
-
-  user.name = name || user.name;
-  user.email = email || user.email;
-  if (password) {
-    user.password = password;
-  }
-
-  await user.save();
-
-  res.status(200).json({
-    success: true,
-    data: {
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      createdAt: user.createdAt,
-    },
-  });
-});
-
 module.exports = {
   getUsers,
   getUser,
@@ -181,3 +180,6 @@ module.exports = {
   getMe,
   updateMe,
 };
+
+
+

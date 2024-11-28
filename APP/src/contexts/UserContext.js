@@ -2,80 +2,46 @@
 
 import React, { createContext, useState, useEffect } from 'react';
 import { Alert } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage'; // Install this package
+import api from '../services/api'; // Ensure the path is correct
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { logoutUser } from '../services/api'; // Import logout function
 
-// Create the UserContext
 export const UserContext = createContext();
 
-// Create the UserProvider component
 export const UserProvider = ({ children }) => {
-  const [user, setUser] = useState(null); // User object: { name, email, ... }
-  const [loading, setLoading] = useState(true); // To handle splash/loading screens
+  // State to hold user data
+  const [user, setUser] = useState(null);
 
-  // Load user data from AsyncStorage when app starts
+  // State to manage loading status
+  const [loading, setLoading] = useState(true);
+
+  // Fetch user profile on app start
   useEffect(() => {
-    const loadUserData = async () => {
+    const initializeUser = async () => {
       try {
-        const userDataString = await AsyncStorage.getItem('@user_data');
-        if (userDataString) {
-          const userData = JSON.parse(userDataString);
-          setUser(userData);
+        const token = await AsyncStorage.getItem('token');
+        if (token) {
+          const response = await api.getUserProfile();
+          if (response.success && response.data) {
+            setUser(response.data);
+          } else {
+            // Token might be invalid or expired
+            // await logout();
+          }
         }
       } catch (error) {
-        console.error('Failed to load user data:', error);
-        Alert.alert('Error', 'Failed to load user data.');
+        console.error('Initialization Error:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    loadUserData();
+    initializeUser();
   }, []);
 
-  // Function to log in the user
-  const login = async (userData) => {
-    try {
-      setUser(userData);
-      await AsyncStorage.setItem('@user_data', JSON.stringify(userData));
-    } catch (error) {
-      console.error('Failed to save user data:', error);
-      Alert.alert('Error', 'Failed to log in.');
-    }
-  };
-
-  // Function to log out the user
-  const logout = async () => {
-    try {
-      setUser(null);
-      await AsyncStorage.removeItem('@user_data');
-    } catch (error) {
-      console.error('Failed to remove user data:', error);
-      Alert.alert('Error', 'Failed to log out.');
-    }
-  };
-
-  // Function to update user details
-  const updateUser = async (newUserData) => {
-    try {
-      const updatedUser = { ...user, ...newUserData };
-      setUser(updatedUser);
-      await AsyncStorage.setItem('@user_data', JSON.stringify(updatedUser));
-    } catch (error) {
-      console.error('Failed to update user data:', error);
-      Alert.alert('Error', 'Failed to update user data.');
-    }
-  };
 
   return (
-    <UserContext.Provider
-      value={{
-        user,
-        loading,
-        login,
-        logout,
-        updateUser,
-      }}
-    >
+    <UserContext.Provider value={{ user, setUser,loading }}>
       {children}
     </UserContext.Provider>
   );

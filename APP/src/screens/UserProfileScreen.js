@@ -53,9 +53,9 @@ const UserProfileScreen = () => {
   const [alertButtons, setAlertButtons] = useState([]);
   const { favouriteItems } = useContext(FavouritesContext);
 
-  // Static Images URLs
-  const STATIC_PROFILE_IMAGE = 'https://images.pexels.com/photos/697509/pexels-photo-697509.jpeg';
-  const STATIC_COVER_IMAGE = 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg';
+  // // Static Images URLs
+  // const STATIC_PROFILE_IMAGE = 'https://images.pexels.com/photos/697509/pexels-photo-697509.jpeg';
+  // const STATIC_COVER_IMAGE = 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg';
 
   // Fetch user profile data
   const fetchUserProfile = async () => {
@@ -67,8 +67,6 @@ const UserProfileScreen = () => {
         // Override profileImage and coverImage with static URLs
         setUser({
           ...response.data.data,
-          profileImage: STATIC_PROFILE_IMAGE,
-          coverImage: STATIC_COVER_IMAGE,
         });
       } else {
         throw new Error(response.message || 'Failed to fetch user profile.');
@@ -123,8 +121,8 @@ const UserProfileScreen = () => {
         // Override profileImage and coverImage with static URLs again
         setUser({
           ...response.data.data,
-          profileImage: STATIC_PROFILE_IMAGE,
-          coverImage: STATIC_COVER_IMAGE,
+          // profileImage: STATIC_PROFILE_IMAGE,
+          // coverImage: STATIC_COVER_IMAGE,
         });
         setAlertTitle('Success');
         setAlertMessage('Your profile has been updated successfully.');
@@ -330,17 +328,17 @@ const UserProfileScreen = () => {
       </View>
 
       {/* Account Settings Section */}
-      <View style={styles.section}>
+      {/* <View style={styles.section}>
         <Text style={[styles.sectionTitle, { color: currentTheme.cardTextColor }]}>
           Account Settings
         </Text>
-        {/* {renderSettingItem('key', 'Change Password', () => {
+        {renderSettingItem('key', 'Change Password', () => {
           navigation.navigate('ChangePassword'); // Ensure this route exists
         })}
         {renderSettingItem('notifications', 'Notification Settings', () => {
           navigation.navigate('NotificationSettings'); // Ensure this route exists
-        })} */}
-      </View>
+        })}
+      </View> */}
 
       {/* Edit Profile Popup */}
       <EditProfilePopup
