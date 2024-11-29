@@ -831,7 +831,7 @@ const CartPage = () => {
 //   // Fetch Payment Intent client secret from backend
   const fetchPaymentIntent = async () => {
     try {
-      const response = await fetch('http://10.0.2.2:5000/api/orders/create-payment-intent', { // Replace with your backend URL
+      const response = await fetch('https://ecom-app-orpin-ten.vercel.app/api/orders/create-payment-intent', { // Replace with your backend URL
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
