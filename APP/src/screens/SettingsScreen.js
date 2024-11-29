@@ -19,6 +19,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 import { ThemeContext } from '../../ThemeContext';
 import { lightTheme, darkTheme } from '../../themes';
+import { UserContext } from '../contexts/UserContext';
 
 const SettingsScreen = () => {
   const [isNotificationsEnabled, setIsNotificationsEnabled] = React.useState(true);
@@ -26,6 +27,7 @@ const SettingsScreen = () => {
 
   const { theme, toggleTheme } = useContext(ThemeContext);
   const currentTheme = theme === 'light' ? lightTheme : darkTheme;
+  const { logout } = useContext(UserContext);
 
   const toggleNotifications = () =>
     setIsNotificationsEnabled((previousState) => !previousState);
@@ -38,9 +40,20 @@ const SettingsScreen = () => {
     navigation.navigate(screen);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     // Implement your logout functionality here
-    navigation.navigate('Login'); // Ensure 'Login' is defined in your navigation stack
+    // navigation.navigate('Login'); // Ensure 'Login' is defined in your navigation stack
+    const response = await logout();
+    // setLoading(false);
+    console.log(response);
+
+    if (response) {
+      navigation.navigate('Login'); // Adjust as per your navigation structure
+    } else {
+      // setAlertTitle('Login Failed');
+      // setAlertMessage('Invalid email or password.');
+      // setAlertVisible(true);
+    }
   };
 
   // Animation references for the back button

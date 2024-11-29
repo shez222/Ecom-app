@@ -14,7 +14,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { loginUser } from '../services/api';
+// import { loginUser } from '../services/api';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -23,6 +23,7 @@ import { lightTheme, darkTheme } from '../../themes';
 
 // Import the CustomAlert component
 import CustomAlert from '../components/CustomAlert';
+import { UserContext, UserProvider } from '../contexts/UserContext';
 
 const { width, height } = Dimensions.get('window');
 
@@ -42,6 +43,7 @@ const LoginScreen = () => {
   // Get theme from context
   const { theme } = useContext(ThemeContext);
   const currentTheme = theme === 'light' ? lightTheme : darkTheme;
+  const { login } = useContext(UserContext);
 
   // Animation values
   const iconOpacity = useRef(new Animated.Value(0)).current;
@@ -82,7 +84,7 @@ const LoginScreen = () => {
     setLoading(true);
 
     // Simulate login API call
-    const response = await loginUser(email, password);
+    const response = await login(email, password);
     setLoading(false);
 
     if (response.success) {

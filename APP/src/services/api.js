@@ -42,6 +42,7 @@ const storeAuthToken = async (token) => {
 export const logoutUser = async () => {
   try {
     await AsyncStorage.removeItem('token');
+    return true;
   } catch (error) {
     console.error('Logout error:', error);
   }

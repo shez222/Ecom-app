@@ -121,7 +121,7 @@ const deleteUser = asyncHandler(async (req, res) => {
 // @route   GET /api/users/me
 // @access  Private
 const getMe = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user.id).select('-password');
+  const user = await User.findById(req.user._id).select('-password');
 
   res.status(200).json({ success: true, data: user });
 });

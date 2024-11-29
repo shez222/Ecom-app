@@ -14,7 +14,7 @@ import {
   Linking,
   Modal,
   ScrollView,
-  RefreshControl, // 1. Import RefreshControl
+  RefreshControl,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -56,7 +56,7 @@ const ProductHistoryPage = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
 
-  // 2. Add a `refreshing` state for pull-to-refresh
+  // Add a refreshing state for pull-to-refresh
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
@@ -64,7 +64,7 @@ const ProductHistoryPage = () => {
   }, []);
 
   /**
-   * 3. Modify the `fetchOrders` function to handle refreshing
+   * Modify the fetchOrders function to handle refreshing
    * @param {boolean} isRefreshing - Indicates if the fetch is due to a pull-to-refresh action
    */
   const fetchOrders = async (isRefreshing = false) => {
@@ -104,10 +104,10 @@ const ProductHistoryPage = () => {
   };
 
   /**
-   * 4. Create the `onRefresh` function for pull-to-refresh
+   * Create the onRefresh function for pull-to-refresh
    */
   const onRefresh = () => {
-    fetchOrders(true); // Pass `true` to indicate refreshing
+    fetchOrders(true); // Pass true to indicate refreshing
   };
 
   /**
@@ -417,7 +417,7 @@ const ProductHistoryPage = () => {
         </View>
       </LinearGradient>
 
-      {/* 5. Orders List with Refresh Control */}
+      {/* Orders List with Refresh Control */}
       <FlatList
         data={orders}
         keyExtractor={(item) => item._id}
@@ -466,11 +466,34 @@ const ProductHistoryPage = () => {
           <View style={[styles.modalContainer, { backgroundColor: currentTheme.cardBackground }]}>
             {selectedOrder && (
               <>
-                <ScrollView contentContainerStyle={styles.modalContent}>
+                {/* Modal Header with Icons */}
+                <View style={styles.modalHeader}>
                   <Text style={[styles.modalTitle, { color: currentTheme.cardTextColor }]}>
                     Receipt Details
                   </Text>
+                  <View style={styles.modalIcons}>
+                    {/* View Receipt PDF Icon */}
+                    <TouchableOpacity
+                      onPress={() => handleGenerateReceipt(selectedOrder)}
+                      style={styles.modalIconButton}
+                      accessibilityLabel="View Receipt PDF"
+                      accessibilityRole="button"
+                    >
+                      <Ionicons name="eye-outline" size={24} color={currentTheme.cardTextColor} />
+                    </TouchableOpacity>
+                    {/* Download Receipt PDF Icon */}
+                    <TouchableOpacity
+                      onPress={() => handleDownloadReceipt(selectedOrder)}
+                      style={styles.modalIconButton}
+                      accessibilityLabel="Download Receipt PDF"
+                      accessibilityRole="button"
+                    >
+                      <Ionicons name="download-outline" size={24} color={currentTheme.cardTextColor} />
+                    </TouchableOpacity>
+                  </View>
+                </View>
 
+                <ScrollView contentContainerStyle={styles.modalContent}>
                   <View style={styles.modalSection}>
                     <Text style={[styles.modalLabel, { color: currentTheme.secondaryColor }]}>
                       Order ID:
@@ -537,33 +560,7 @@ const ProductHistoryPage = () => {
                   </View>
                 </ScrollView>
 
-                {/* Buttons */}
-                <View style={styles.modalButtonsContainer}>
-                  <TouchableOpacity
-                    style={[
-                      styles.modalButton,
-                      { backgroundColor: currentTheme.primaryColor },
-                    ]}
-                    onPress={() => handleGenerateReceipt(selectedOrder)}
-                    accessibilityLabel="View Receipt PDF"
-                    accessibilityRole="button"
-                  >
-                    <Ionicons name="eye-outline" size={20} color="#FFFFFF" />
-                    <Text style={styles.modalButtonText}>View Receipt PDF</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[
-                      styles.modalButton,
-                      { backgroundColor: currentTheme.secondaryColor },
-                    ]}
-                    onPress={() => handleDownloadReceipt(selectedOrder)}
-                    accessibilityLabel="Download Receipt PDF"
-                    accessibilityRole="button"
-                  >
-                    <Ionicons name="download-outline" size={20} color="#FFFFFF" />
-                    <Text style={styles.modalButtonText}>Download Receipt PDF</Text>
-                  </TouchableOpacity>
-                </View>
+                {/* Close Button */}
                 <TouchableOpacity
                   style={[
                     styles.closeButton,
@@ -695,26 +692,7 @@ const styles = StyleSheet.create({
     marginLeft: 15,
     padding: 6,
   },
-  // Existing styles (Retained for reference)
-  pdfLinksContainer: {
-    flexDirection: 'row',
-    marginTop: 5,
-  },
-  pdfButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#2196F3',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 20,
-    marginRight: 10,
-  },
-  pdfButtonText: {
-    color: '#FFFFFF',
-    marginLeft: 5,
-    fontSize: 14,
-    fontWeight: '500',
-  },
+  // Removed styles related to old PDF buttons
   viewReceiptButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -722,7 +700,6 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: 'transparent',
     borderWidth: 1,
-    // borderColor: '#2196F3',
     borderRadius: 8,
   },
   viewReceiptText: {
@@ -769,6 +746,11 @@ const styles = StyleSheet.create({
     // Android Shadow
     elevation: 5,
   },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   modalContent: {
     paddingBottom: 20,
   },
@@ -776,7 +758,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '700',
     marginBottom: 15,
-    textAlign: 'center',
+    textAlign: 'left',
   },
   modalSection: {
     marginBottom: 10,
@@ -825,34 +807,17 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
   },
-  // New styles for modal buttons
-  modalButtonsContainer: {
+  // New styles for modal header icons
+  modalIcons: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 10,
   },
-  modalButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 10,
-    flex: 1,
-    marginHorizontal: 5,
-  },
-  modalButtonText: {
-    color: '#FFFFFF',
-    marginLeft: 8,
-    fontSize: 16,
-    fontWeight: '500',
+  modalIconButton: {
+    marginLeft: 15,
+    padding: 6,
   },
 });
 
 export default ProductHistoryPage;
-
-
-
-
 
 
 
@@ -878,6 +843,7 @@ export default ProductHistoryPage;
 //   Linking,
 //   Modal,
 //   ScrollView,
+//   RefreshControl, // 1. Import RefreshControl
 // } from 'react-native';
 // import { Ionicons } from '@expo/vector-icons';
 // import { useNavigation } from '@react-navigation/native';
@@ -919,12 +885,23 @@ export default ProductHistoryPage;
 //   const [modalVisible, setModalVisible] = useState(false);
 //   const [selectedOrder, setSelectedOrder] = useState(null);
 
+//   // 2. Add a `refreshing` state for pull-to-refresh
+//   const [refreshing, setRefreshing] = useState(false);
+
 //   useEffect(() => {
 //     fetchOrders();
 //   }, []);
 
-//   const fetchOrders = async () => {
-//     setLoading(true);
+//   /**
+//    * 3. Modify the `fetchOrders` function to handle refreshing
+//    * @param {boolean} isRefreshing - Indicates if the fetch is due to a pull-to-refresh action
+//    */
+//   const fetchOrders = async (isRefreshing = false) => {
+//     if (isRefreshing) {
+//       setRefreshing(true);
+//     } else {
+//       setLoading(true);
+//     }
 //     setError(null);
 //     try {
 //       const response = await api.getMyOrders();
@@ -947,8 +924,19 @@ export default ProductHistoryPage;
 //       ]);
 //       setAlertVisible(true);
 //     } finally {
-//       setLoading(false);
+//       if (isRefreshing) {
+//         setRefreshing(false);
+//       } else {
+//         setLoading(false);
+//       }
 //     }
+//   };
+
+//   /**
+//    * 4. Create the `onRefresh` function for pull-to-refresh
+//    */
+//   const onRefresh = () => {
+//     fetchOrders(true); // Pass `true` to indicate refreshing
 //   };
 
 //   /**
@@ -1052,6 +1040,10 @@ export default ProductHistoryPage;
 //     }
 //   };
 
+//   /**
+//    * Opens the PDF link using the device's default PDF viewer.
+//    * @param {string} pdfLink - The URL to the PDF.
+//    */
 //   const handleViewPDF = async (pdfLink) => {
 //     try {
 //       const supported = await Linking.canOpenURL(pdfLink);
@@ -1075,6 +1067,10 @@ export default ProductHistoryPage;
 //     }
 //   };
 
+//   /**
+//    * Downloads the PDF from the provided link.
+//    * @param {string} pdfLink - The URL to the PDF.
+//    */
 //   const handleDownloadPDF = async (pdfLink) => {
 //     try {
 //       const uri = pdfLink;
@@ -1101,6 +1097,11 @@ export default ProductHistoryPage;
 //     }
 //   };
 
+//   /**
+//    * Returns the color based on the order status.
+//    * @param {string} status - The status of the order.
+//    * @returns {string} - The corresponding color code.
+//    */
 //   const getStatusColor = (status) => {
 //     switch (status) {
 //       case 'pending':
@@ -1114,6 +1115,11 @@ export default ProductHistoryPage;
 //     }
 //   };
 
+//   /**
+//    * Capitalizes the first letter of a string.
+//    * @param {string} string - The input string.
+//    * @returns {string} - The capitalized string.
+//    */
 //   const capitalizeFirstLetter = (string) => {
 //     return string.charAt(0).toUpperCase() + string.slice(1);
 //   };
@@ -1135,6 +1141,11 @@ export default ProductHistoryPage;
 //     setModalVisible(false);
 //   };
 
+//   /**
+//    * Renders each order item in the FlatList.
+//    * @param {object} param0 - The item object.
+//    * @returns {JSX.Element} - The rendered order item.
+//    */
 //   const renderOrderItem = ({ item }) => (
 //     <View style={[styles.orderItem, { backgroundColor: currentTheme.cardBackground }]}>
 //       <View style={styles.orderHeader}>
@@ -1188,7 +1199,7 @@ export default ProductHistoryPage;
 //       />
 //       {/* View Receipt Button */}
 //       <TouchableOpacity
-//         style={[styles.viewReceiptButton,{borderColor:currentTheme.backgroundHeaderColor}]}
+//         style={[styles.viewReceiptButton, { borderColor: currentTheme.backgroundHeaderColor }]}
 //         onPress={() => openReceiptModal(item)}
 //         accessibilityLabel="View Receipt"
 //         accessibilityRole="button"
@@ -1235,7 +1246,7 @@ export default ProductHistoryPage;
 //         </View>
 //       </LinearGradient>
 
-//       {/* Orders List */}
+//       {/* 5. Orders List with Refresh Control */}
 //       <FlatList
 //         data={orders}
 //         keyExtractor={(item) => item._id}
@@ -1261,6 +1272,14 @@ export default ProductHistoryPage;
 //               </Text>
 //             </View>
 //           )
+//         }
+//         refreshControl={
+//           <RefreshControl
+//             refreshing={refreshing} // Bind to refreshing state
+//             onRefresh={onRefresh} // Bind to onRefresh function
+//             colors={[currentTheme.primaryColor]} // Android color
+//             tintColor={currentTheme.primaryColor} // iOS color
+//           />
 //         }
 //       />
 

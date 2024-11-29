@@ -18,6 +18,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { ThemeContext } from '../../ThemeContext'; // Import ThemeContext
 import { lightTheme, darkTheme } from '../../themes'; // Import theme definitions
+import CustomAlert from '../components/CustomAlert'; // Import CustomAlert
 
 const { width, height } = Dimensions.get('window');
 
@@ -38,6 +39,14 @@ const EditProfilePopup = ({ visible, onClose, userData, onSave }) => {
   // Access the current theme
   const { theme } = useContext(ThemeContext);
   const currentTheme = theme === 'light' ? lightTheme : darkTheme;
+
+    // State for controlling the CustomAlert
+    const [alertVisible, setAlertVisible] = useState(false);
+    const [alertTitle, setAlertTitle] = useState('');
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertIcon, setAlertIcon] = useState('');
+    const [alertButtons, setAlertButtons] = useState([]);
+  
 
   useEffect(() => {
     setName(userData.name || '');
@@ -69,27 +78,77 @@ const EditProfilePopup = ({ visible, onClose, userData, onSave }) => {
   const handleSave = () => {
     // Perform validation
     if (!name || !email) {
-      Alert.alert('Validation Error', 'Name and email are required.');
+      // Alert.alert('Validation Error', 'Name and email are required.');
+      setAlertTitle('Validation Error');
+      setAlertMessage('Name and email are required.');
+      setAlertIcon('profile');
+      setAlertButtons([
+        {
+          text: 'OK',
+          onPress: () => setAlertVisible(false),
+        },
+      ]);
+      setAlertVisible(true);
       return;
     }
 
     if (email && !isValidEmail(email)) {
-      Alert.alert('Invalid Email', 'Please enter a valid email address.');
+      // Alert.alert('Invalid Email', 'Please enter a valid email address.');
+      setAlertTitle('Invalid Email');
+      setAlertMessage('Please enter a valid email address.');
+      setAlertIcon('profile');
+      setAlertButtons([
+        {
+          text: 'OK',
+          onPress: () => setAlertVisible(false),
+        },
+      ]);
+      setAlertVisible(true);
       return;
     }
 
     if (phone && !isValidPhoneNumber(phone)) {
-      Alert.alert('Invalid Phone Number', 'Please enter a valid phone number.');
+      // Alert.alert('Invalid Phone Number', 'Please enter a valid phone number.');
+      setAlertTitle('Invalid Phone Number');
+      setAlertMessage('Please enter a valid phone number.');
+      setAlertIcon('profile');
+      setAlertButtons([
+        {
+          text: 'OK',
+          onPress: () => setAlertVisible(false),
+        },
+      ]);
+      setAlertVisible(true);
       return;
     }
 
     if (profileImageUrl && !isValidImageUrl(profileImageUrl)) {
-      Alert.alert('Invalid URL', 'Please enter a valid image URL for the profile image.');
+      // Alert.alert('Invalid URL', 'Please enter a valid image URL for the profile image.');
+      setAlertTitle('Invalid URL');
+      setAlertMessage('Please enter a valid image URL for the profile image.');
+      setAlertIcon('profile');
+      setAlertButtons([
+        {
+          text: 'OK',
+          onPress: () => setAlertVisible(false),
+        },
+      ]);
+      setAlertVisible(true);
       return;
     }
 
     if (coverImageUrl && !isValidImageUrl(coverImageUrl)) {
-      Alert.alert('Invalid URL', 'Please enter a valid image URL for the cover image.');
+      // Alert.alert('Invalid URL', 'Please enter a valid image URL for the cover image.');
+      setAlertTitle('Invalid URL');
+      setAlertMessage('Please enter a valid image URL for the cover image.');
+      setAlertIcon('profile');
+      setAlertButtons([
+        {
+          text: 'OK',
+          onPress: () => setAlertVisible(false),
+        },
+      ]);
+      setAlertVisible(true);
       return;
     }
 
@@ -107,7 +166,7 @@ const EditProfilePopup = ({ visible, onClose, userData, onSave }) => {
     onClose();
 
     // Optional: Provide feedback to the user
-    Alert.alert('Success', 'Your profile has been updated successfully.');
+    // Alert.alert('Success', 'Your profile has been updated successfully.');
   };
 
   return (
@@ -306,6 +365,15 @@ const EditProfilePopup = ({ visible, onClose, userData, onSave }) => {
             >
               <Text style={styles.saveButtonText}>Save</Text>
             </TouchableOpacity>
+              {/* CustomAlert Component */}
+            <CustomAlert
+              visible={alertVisible}
+              title={alertTitle}
+              message={alertMessage}
+              icon={alertIcon}
+              onClose={() => setAlertVisible(false)}
+              buttons={alertButtons}
+            />
           </ScrollView>
         </View>
       </KeyboardAvoidingView>

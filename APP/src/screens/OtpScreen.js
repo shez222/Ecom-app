@@ -15,7 +15,7 @@ import {
   Vibration,
   useWindowDimensions,
 } from 'react-native';
-import { verifyOtp, resendOtp } from '../services/api';
+import { verifyOtp, forgotPassword } from '../services/api';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons'; // Updated Import for Expo
 import { LinearGradient } from 'expo-linear-gradient';
@@ -170,7 +170,7 @@ const OtpScreen = () => {
     setError('');
 
     try {
-      const response = await resendOtp();
+      const response = await forgotPassword(email);
       setLoading(false);
 
       if (response) {

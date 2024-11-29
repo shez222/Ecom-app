@@ -24,6 +24,7 @@ import CustomAlert from '../components/CustomAlert'; // Import CustomAlert
 
 import api from '../services/api'; // Import the centralized API functions
 import { FavouritesContext, FavouritesProvider } from '../contexts/FavouritesContext'; // Import FavouritesContext and Provider
+import { UserContext } from '../contexts/UserContext';
 
 
 const { width } = Dimensions.get('window');
@@ -36,7 +37,7 @@ const UserProfileScreen = () => {
   const currentTheme = theme === 'light' ? lightTheme : darkTheme;
 
   // State for user data
-  const [user, setUser] = useState(null);
+  const {user, setUser} = useContext(UserContext);
 
   // State for loading and refreshing
   const [loading, setLoading] = useState(true);
@@ -62,12 +63,12 @@ const UserProfileScreen = () => {
     try {
       const response = await api.getUserProfile();
       if (response.success && response.data) {
-        console.log('Fetched User Profile:', response.data.data);
+        console.log('Fetched User Profile:', response.data);
         
         // Override profileImage and coverImage with static URLs
-        setUser({
-          ...response.data.data,
-        });
+        setUser(
+          response.data
+        );
       } else {
         throw new Error(response.message || 'Failed to fetch user profile.');
       }
@@ -119,11 +120,9 @@ const UserProfileScreen = () => {
         console.log('Updated User Profile:', response.data);
         
         // Override profileImage and coverImage with static URLs again
-        setUser({
-          ...response.data.data,
-          // profileImage: STATIC_PROFILE_IMAGE,
-          // coverImage: STATIC_COVER_IMAGE,
-        });
+        setUser(
+          response.data
+          );
         setAlertTitle('Success');
         setAlertMessage('Your profile has been updated successfully.');
         setAlertIcon('checkmark-circle');
@@ -223,7 +222,7 @@ const UserProfileScreen = () => {
     >
       {/* Header Section with Cover Image */}
       <View style={styles.headerContainer}>
-        {user?.coverImage ? (
+        {user?.data?.coverImage ? (
           <Image
             source={{ uri: user.coverImage }}
             style={styles.coverImage}
@@ -248,7 +247,7 @@ const UserProfileScreen = () => {
 
       {/* User Profile Info */}
       <View style={styles.userInfoContainer}>
-        {user?.profileImage ? (
+        {user?.data?.profileImage ? (
           <Image
             source={{ uri: user.profileImage }}
             style={[
@@ -271,10 +270,10 @@ const UserProfileScreen = () => {
           </View>
         )}
         <Text style={[styles.userName, { color: currentTheme.textColor }]}>
-          {user?.name || 'N/A'}
+          {user?.data?.name || 'N/A'}
         </Text>
         <Text style={[styles.userEmail, { color: currentTheme.textColor }]}>
-          {user?.email || 'N/A'}
+          {user?.data?.email || 'N/A'}
         </Text>
         <TouchableOpacity
           style={[
@@ -294,7 +293,7 @@ const UserProfileScreen = () => {
       <View style={styles.statsContainer}>
         <View style={styles.statItem}>
           <Text style={[styles.statNumber, { color: currentTheme.primaryColor }]}>
-            {user?.purchasesCount || 0}
+            {user?.data?.purchasesCount || 0}
           </Text>
           <Text style={[styles.statLabel, { color: currentTheme.textColor }]}>
             Purchases
@@ -310,7 +309,7 @@ const UserProfileScreen = () => {
         </View>
         <View style={styles.statItem}>
           <Text style={[styles.statNumber, { color: currentTheme.primaryColor }]}>
-            {user?.reviewsCount || 0}
+            {user?.data?.reviewsCount || 0}
           </Text>
           <Text style={[styles.statLabel, { color: currentTheme.textColor }]}>
             Reviews
@@ -323,8 +322,8 @@ const UserProfileScreen = () => {
         <Text style={[styles.sectionTitle, { color: currentTheme.cardTextColor }]}>
           Personal Information
         </Text>
-        {renderInfoItem('call', user?.phone || 'N/A')}
-        {renderInfoItem('location', user?.address || 'N/A')}
+        {renderInfoItem('call', user?.data?.phone || 'N/A')}
+        {renderInfoItem('location', user?.data?.address || 'N/A')}
       </View>
 
       {/* Account Settings Section */}
@@ -344,7 +343,7 @@ const UserProfileScreen = () => {
       <EditProfilePopup
         visible={isEditProfileVisible}
         onClose={() => setEditProfileVisible(false)}
-        userData={user}
+        userData={user.data}
         onSave={handleSaveProfile}
       />
 

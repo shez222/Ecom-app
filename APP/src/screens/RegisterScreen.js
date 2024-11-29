@@ -21,7 +21,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { ThemeContext } from '../../ThemeContext';
 import { lightTheme, darkTheme } from '../../themes';
 import CustomAlert from '../components/CustomAlert'; // Import CustomAlert
-
+import { UserContext } from '../contexts/UserContext';
 const { width, height } = Dimensions.get('window');
 
 const RegisterScreen = () => {
@@ -37,6 +37,8 @@ const RegisterScreen = () => {
   // Confirm password state
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordsMatch, setPasswordsMatch] = useState(true); // New state for password match
+
+  const { register } = useContext(UserContext);
 
   // Loading state
   const [loading, setLoading] = useState(false);
@@ -181,7 +183,7 @@ const RegisterScreen = () => {
 
     // Simulate registration API call
     const userData = { name, email, password, role: 'user' };
-    const response = await registerUser(userData);
+    const response = await register(userData);
     setLoading(false);
 
     if (response) {
