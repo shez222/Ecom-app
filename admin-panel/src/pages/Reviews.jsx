@@ -28,7 +28,7 @@ const Reviews = () => {
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const reviewsPerPage = 5;
+  const reviewsPerPage = 10;
 
   // Fetch reviews on component mount
   useEffect(() => {

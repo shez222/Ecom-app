@@ -28,7 +28,7 @@ const Users = () => {
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const usersPerPage = 5; // Adjust as needed
+  const usersPerPage = 10; // Adjust as needed
 
   // Fetch users from backend when component mounts
   useEffect(() => {
@@ -40,7 +40,7 @@ const Users = () => {
     initialValues: {
       name: currentUser ? currentUser.name : '',
       email: currentUser ? currentUser.email : '',
-      role: currentUser ? currentUser.role : 'student',
+      role: currentUser ? currentUser.role : 'user',
       password: '',
     },
     enableReinitialize: true, // Reinitialize form when currentUser changes
@@ -48,7 +48,7 @@ const Users = () => {
       name: Yup.string().required('Name is required'),
       email: Yup.string().email('Invalid Email').required('Email is required'),
       role: Yup.string()
-        .oneOf(['admin', 'student'], 'Invalid Role') // Ensure roles match backend definitions
+        .oneOf(['admin', 'user'], 'Invalid Role') // Ensure roles match backend definitions
         .required('Role is required'),
       password: currentUser
         ? Yup.string().notRequired()
@@ -361,7 +361,7 @@ const Users = () => {
                   onBlur={formik.handleBlur}
                 >
                   <option value="admin">Admin</option>
-                  <option value="student">Student</option>
+                  <option value="user">User</option>
                 </select>
                 {formik.touched.role && formik.errors.role && (
                   <div className="text-red-500 text-sm mt-1">

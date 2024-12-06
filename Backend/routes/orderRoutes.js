@@ -7,6 +7,7 @@ const {
   addOrderItems,
   getMyOrders,
   getAllOrders,
+  deleteOrder,
 } = require('../controllers/orderController');
 const { protect } = require('../middleware/authMiddleware');
 
@@ -21,5 +22,6 @@ router.get('/myorders', protect, getMyOrders);
 
 // Get all orders (Admin)
 router.get('/', protect, getAllOrders);
+router.delete('/:id', protect, deleteOrder);
 
 module.exports = router;

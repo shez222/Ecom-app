@@ -121,9 +121,20 @@ const getAllOrders = asyncHandler(async (req, res) => {
   res.json(orders);
 });
 
+const deleteOrder = asyncHandler(async (req, res) => {
+  const orderId = req.params.id;
+  const deletedOrder = await Order.findByIdAndDelete(orderId);
+  if (!deletedOrder) {
+    res.status(404);
+    throw new Error('Order not found');
+  }
+  res.json({ message: 'Order deleted successfully' });
+});
+
 module.exports = {
   createPaymentIntent,
   addOrderItems,
   getMyOrders,
   getAllOrders,
+  deleteOrder,
 };

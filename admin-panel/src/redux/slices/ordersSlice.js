@@ -5,7 +5,9 @@ import axiosInstance from '../../utils/axiosInstance';
 // Fetch all orders/carts
 export const fetchOrders = createAsyncThunk('orders/fetchOrders', async (_, thunkAPI) => {
   try {
-    const response = await axiosInstance.get('/orders');
+    const response = await axiosInstance.get('/api/orders');
+    console.log(response.data);
+    
     return response.data;
   } catch (error) {
     return thunkAPI.rejectWithValue(
@@ -30,9 +32,9 @@ export const updateOrderStatus = createAsyncThunk(
 );
 
 // Delete an order/cart
-export const deleteOrder = createAsyncThunk('orders/deleteOrder', async (id, thunkAPI) => {
+export const deleteOrder = createAsyncThunk('/api/orders/deleteOrder', async (id, thunkAPI) => {
   try {
-    await axiosInstance.delete(`/orders/${id}`);
+    await axiosInstance.delete(`/api/orders/${id}`);
     return id;
   } catch (error) {
     return thunkAPI.rejectWithValue(
