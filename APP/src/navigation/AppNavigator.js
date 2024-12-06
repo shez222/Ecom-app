@@ -34,7 +34,7 @@ const FavouritesStack = createStackNavigator();
 
 const MarketStackScreen = () => (
   <MarketStack.Navigator screenOptions={{ headerShown: false }}>
-    <MarketStack.Screen name="Market" component={MarketPage} />
+    <MarketStack.Screen name="MarketHome" component={MarketPage} />
     <MarketStack.Screen name="ProductPage" component={ProductPage} />
     <MarketStack.Screen name="CartPage" component={CartPage} />
     <MarketStack.Screen name="Settings" component={SettingsScreen} />
@@ -43,7 +43,7 @@ const MarketStackScreen = () => (
 
 const FavouritesStackScreen = () => (
   <FavouritesStack.Navigator screenOptions={{ headerShown: false }}>
-    <FavouritesStack.Screen name="Favourites" component={FavouritesPage} />
+    <FavouritesStack.Screen name="Favourites2" component={FavouritesPage} />
     <FavouritesStack.Screen name="ProductPage" component={ProductPage} />
     <FavouritesStack.Screen name="CartPage" component={CartPage} />
     <FavouritesStack.Screen name="Settings" component={SettingsScreen} />
