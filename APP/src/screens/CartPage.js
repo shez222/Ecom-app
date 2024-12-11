@@ -222,7 +222,7 @@ const CartPage = () => {
           });
   
           setAlertTitle('Order Placed');
-          setAlertMessage('Your successfully purchased the products in your cart. Check your purchase history.');
+          setAlertMessage('You have successfully purchased the products in your cart. Check your purchase history to view details.');
           setAlertIcon('checkmark-circle');
           setAlertButtons([
             {
@@ -230,7 +230,7 @@ const CartPage = () => {
               onPress: () => {
                 setAlertVisible(false);
                 clearCart();
-                navigation.goBack(); // Adjust navigation as needed
+                navigation.navigate('PurchaseHistory'); // Adjust navigation as needed
               },
             },
           ]);

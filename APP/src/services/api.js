@@ -403,6 +403,29 @@ export const fetchPaymentIntent = async (totalPrice) => {
   }
 };
 
+// ----------------------- Token Verification Function ----------------------- //
+
+/**
+ * Verify Authentication Token with Backend
+ * @returns {Promise<boolean>} True if token is valid, else false.
+ */
+export const verifyAuthToken = async () => {
+  try {
+    const token = await getAuthToken();
+    if (!token) return false;
+
+    const response = await axios.get(`${API_URL}/auth/verify-token`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return response.data.success;
+  } catch (error) {
+    console.error('Token verification error:', error.response?.data?.message || error.message);
+    return false;
+  }
+};
 // ----------------------- Export All Functions ----------------------- //
 
 export default {
@@ -432,6 +455,9 @@ export default {
 
   // Payment
   fetchPaymentIntent,
+
+  // Token Verification
+  verifyAuthToken,
 };
 
 

@@ -10,7 +10,7 @@ import { lightTheme, darkTheme } from '../../themes';
 import { LinearGradient } from 'expo-linear-gradient';
 import { UserContext } from '../contexts/UserContext';
 
-const DEFAULT_PROFILE_IMAGE = 'https://images.pexels.com/photos/697509/pexels-photo-697509.jpeg';
+const DEFAULT_PROFILE_IMAGE = 'https://w7.pngwing.com/pngs/684/806/png-transparent-user-avatar-enter-photo-placeholder.png';
 
 const CustomHeader = ({ userProfileImage = DEFAULT_PROFILE_IMAGE, username = 'John Doe' }) => {
   const { theme } = useContext(ThemeContext);
@@ -32,12 +32,12 @@ const CustomHeader = ({ userProfileImage = DEFAULT_PROFILE_IMAGE, username = 'Jo
       {/* User Info */}
       <TouchableOpacity
         style={styles.userInfoContainer}
-        onPress={() => navigation.navigate('UserProfileScreen')}
+        onPress={() => navigation.navigate('UserProfile')}
         accessibilityLabel="Go to Profile"
         accessibilityRole="button"
       >
         <Image
-          source={{ uri: userProfileImage }}
+          source={{ uri: user.data.profileImage || DEFAULT_PROFILE_IMAGE }}
           style={[
             styles.profileImage,
             { borderColor: currentTheme.borderColor },

@@ -29,6 +29,10 @@ import { UserContext } from '../contexts/UserContext';
 
 const { width } = Dimensions.get('window');
 
+  // // Static Images URLs
+  const STATIC_PROFILE_IMAGE = 'https://w7.pngwing.com/pngs/684/806/png-transparent-user-avatar-enter-photo-placeholder.png';
+  const STATIC_COVER_IMAGE = 'https://t3.ftcdn.net/jpg/04/25/64/80/240_F_425648048_vJdR1FZINXrMjExnnmk8zUGOrdPf6JTr.jpg';
+
 const UserProfileScreen = () => {
   const navigation = useNavigation();
 
@@ -54,9 +58,7 @@ const UserProfileScreen = () => {
   const [alertButtons, setAlertButtons] = useState([]);
   const { favouriteItems } = useContext(FavouritesContext);
 
-  // // Static Images URLs
-  // const STATIC_PROFILE_IMAGE = 'https://images.pexels.com/photos/697509/pexels-photo-697509.jpeg';
-  // const STATIC_COVER_IMAGE = 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg';
+
 
   // Fetch user profile data
   const fetchUserProfile = async () => {
@@ -222,23 +224,12 @@ const UserProfileScreen = () => {
     >
       {/* Header Section with Cover Image */}
       <View style={styles.headerContainer}>
-        {user?.data?.coverImage ? (
           <Image
-            source={{ uri: user.coverImage }}
+            source={{ uri: user.data.coverImage || STATIC_COVER_IMAGE }}
             style={styles.coverImage}
             resizeMode="cover"
             accessibilityLabel={`${user.name}'s cover image`}
           />
-        ) : (
-          <View
-            style={[
-              styles.coverImage,
-              { backgroundColor: currentTheme.placeholderBackground },
-            ]}
-          >
-            <Ionicons name="image-outline" size={60} color={currentTheme.placeholderTextColor} />
-          </View>
-        )}
         <LinearGradient
           colors={['rgba(0,0,0,0.5)', 'transparent']}
           style={styles.coverGradient}
@@ -247,28 +238,17 @@ const UserProfileScreen = () => {
 
       {/* User Profile Info */}
       <View style={styles.userInfoContainer}>
-        {user?.data?.profileImage ? (
-          <Image
-            source={{ uri: user.profileImage }}
-            style={[
-              styles.profileImage,
-              { borderColor: currentTheme.borderColor },
-            ]}
-            accessibilityLabel={`${user.name}'s profile picture`}
-            onError={(e) => {
-              console.log(`Failed to load profile image for ${user.name}:`, e.nativeEvent.error);
-            }}
-          />
-        ) : (
-          <View
-            style={[
-              styles.profileImage,
-              { borderColor: currentTheme.borderColor, backgroundColor: currentTheme.placeholderBackground, justifyContent: 'center', alignItems: 'center' },
-            ]}
-          >
-            <Ionicons name="person-circle-outline" size={120} color={currentTheme.placeholderTextColor} />
-          </View>
-        )}
+        <Image
+          source={{ uri: user.data.profileImage || STATIC_PROFILE_IMAGE }}
+          style={[
+            styles.profileImage,
+            { borderColor: currentTheme.borderColor },
+          ]}
+          accessibilityLabel={`${user.name}'s profile picture`}
+          onError={(e) => {
+            console.log(`Failed to load profile image for ${user.name}:`, e.nativeEvent.error);
+          }}
+        />
         <Text style={[styles.userName, { color: currentTheme.textColor }]}>
           {user?.data?.name || 'N/A'}
         </Text>
