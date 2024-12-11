@@ -1,8 +1,10 @@
 // controllers/orderController.js
-
 const asyncHandler = require('express-async-handler');
 const Order = require('../models/Order');
-const stripe = require('stripe')('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');
+const dotenv = require('dotenv');
+dotenv.config();
+
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 /**
  * @desc    Create a Stripe Payment Intent
