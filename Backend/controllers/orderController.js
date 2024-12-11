@@ -2,7 +2,7 @@
 
 const asyncHandler = require('express-async-handler');
 const Order = require('../models/Order');
-const stripe = require('stripe')('sk_test_51OXlAIAZK57wNYnQQluuPOe6YHwpKCs2dZfKLaEe7Ye67OObYR3Hes3i0Vjo1yp450mlVWQ9ufvWWYYymF1mc33R00GwSCgwFi');
+const stripe = require('stripe')('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');
 
 /**
  * @desc    Create a Stripe Payment Intent

@@ -222,7 +222,7 @@ const CartPage = () => {
           });
   
           setAlertTitle('Order Placed');
-          setAlertMessage('Your order has been placed successfully!');
+          setAlertMessage('Your successfully purchased the products in your cart. Check your purchase history.');
           setAlertIcon('checkmark-circle');
           setAlertButtons([
             {
