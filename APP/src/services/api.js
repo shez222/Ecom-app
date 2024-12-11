@@ -4,11 +4,11 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Replace with your actual API URL
-const API_URL = 'https://ecom-app-orpin-ten.vercel.app/api';
-
+// const API_URL = 'http://10.0.0.2:5000/api';
+const API_URL = 'https://ecom-app-gray.vercel.app/api';
 // ----------------------- Helper Functions ----------------------- //
 
-/**
+/**shehr
  * Retrieve the authentication token from AsyncStorage.
  * @returns {Promise<string|null>} The JWT token or null if not found.
  */
@@ -370,6 +370,39 @@ export const getMyOrders = async () => {
   }
 };
 
+// ----------------------- Payment Functions ----------------------- //
+
+/**
+ * Fetch Payment Intent for Orders
+ * @param {number} totalPrice - Total price of the order (in dollars).
+ * @returns {Promise<string|null>} The client secret for the payment intent or null on error.
+ */
+export const fetchPaymentIntent = async (totalPrice) => {
+  try {
+    const token = await getAuthToken();
+    if (!token) {
+      throw new Error('No authentication token found.');
+    }
+
+    const response = await fetch(`${API_URL}/orders/create-payment-intent`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        totalPrice: parseInt(totalPrice, 10) * 100, // Convert to cents
+      }),
+    });
+
+    const { clientSecret } = await response.json();
+    return clientSecret;
+  } catch (error) {
+    console.error('Error fetching payment intent:', error);
+    return null; // Return null on error
+  }
+};
+
 // ----------------------- Export All Functions ----------------------- //
 
 export default {
@@ -396,6 +429,9 @@ export default {
   // Orders
   createOrder,
   getMyOrders,
+
+  // Payment
+  fetchPaymentIntent,
 };
 
 

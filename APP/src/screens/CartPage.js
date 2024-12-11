@@ -25,6 +25,7 @@ import { CartContext } from '../contexts/CartContext';
 import CustomAlert from '../components/CustomAlert'; // Import CustomAlert
 import { useStripe } from '@stripe/stripe-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { fetchPaymentIntent } from '../services/api';
 
 const { width, height } = Dimensions.get('window');
 
@@ -89,42 +90,42 @@ const CartPage = () => {
     </View>
   );
 //   // Fetch Payment Intent client secret from backend
-  const fetchPaymentIntent = async () => {
-    try {
-      const response = await fetch('https://ecom-app-orpin-ten.vercel.app/api/orders/create-payment-intent', { // Replace with your backend URL
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-           'Authorization': `Bearer ${await AsyncStorage.getItem('token')}`
-        },
-        body: JSON.stringify({
-          totalPrice: parseInt(totalPrice) * 100, // Convert to cents
-        }),
-      });
+  // const fetchPaymentIntent = async () => {
+  //   try {
+  //     const response = await fetch('https://ecom-app-gray.vercel.app/api/orders/create-payment-intent', { // Replace with your backend URL
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //          'Authorization': `Bearer ${await AsyncStorage.getItem('token')}`
+  //       },
+  //       body: JSON.stringify({
+  //         totalPrice: parseInt(totalPrice) * 100, // Convert to cents
+  //       }),
+  //     });
 
-      const { clientSecret } = await response.json();
-      return clientSecret;
-    } catch (error) {
-      console.error('Error fetching payment intent:', error);
-      // Alert.alert('Error', 'Failed to initiate payment.');
-      setAlertTitle('Payment Failed');
-      setAlertMessage(error);
-      setAlertIcon('cart-outline');
-      setAlertButtons([
-        {
-          text: 'OK',
-          onPress: () => setAlertVisible(false),
-        },
-      ]);
-      setAlertVisible(true);
-      return null;
-    }
-  };
+  //     const { clientSecret } = await response.json();
+  //     return clientSecret;
+  //   } catch (error) {
+  //     console.error('Error fetching payment intent:', error);
+  //     // Alert.alert('Error', 'Failed to initiate payment.');
+  //     setAlertTitle('Payment Failed');
+  //     setAlertMessage(error);
+  //     setAlertIcon('cart-outline');
+  //     setAlertButtons([
+  //       {
+  //         text: 'OK',
+  //         onPress: () => setAlertVisible(false),
+  //       },
+  //     ]);
+  //     setAlertVisible(true);
+  //     return null;
+  //   }
+  // };
 
   const handleCheckout = async () => {
     setLoading(true);
 
-    const clientSecret = await fetchPaymentIntent();
+    const clientSecret = await fetchPaymentIntent(totalPrice);
     console.log(clientSecret);
     
 
