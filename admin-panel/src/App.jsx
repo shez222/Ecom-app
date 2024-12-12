@@ -60,6 +60,7 @@ import Users from './pages/Users';
 import Products from './pages/Products';
 import Orders from './pages/Orders';
 import Reviews from './pages/Reviews';
+import LandingPage from './pages/LandingPage';
 import { useSelector } from 'react-redux';
 
 const App = () => {
@@ -85,6 +86,7 @@ const App = () => {
           path="/reset-password/:resetToken"
           element={!isAuthenticated ? <ResetPassword /> : <Navigate to="/" replace />}
         />
+        <Route path="/landing" element={<LandingPage />} />
 
         {/* Protected Routes */}
         <Route
