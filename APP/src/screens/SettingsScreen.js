@@ -45,7 +45,7 @@ const SettingsScreen = () => {
     // navigation.navigate('Login'); // Ensure 'Login' is defined in your navigation stack
     const response = await logout();
     // setLoading(false);
-    console.log(response);
+    console.log("sdsd",response);
 
     if (response) {
       navigation.navigate('Login'); // Adjust as per your navigation structure

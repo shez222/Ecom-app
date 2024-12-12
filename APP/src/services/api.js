@@ -391,7 +391,7 @@ export const fetchPaymentIntent = async (totalPrice) => {
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        totalPrice: parseInt(totalPrice, 10) * 100, // Convert to cents
+        totalPrice: parseInt(totalPrice) * 100, // Convert to cents
       }),
     });
 

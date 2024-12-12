@@ -13,7 +13,8 @@ import { PUBLISH_STRIPE_KEY } from '@env';
 const App = () => {
 console.log(PUBLISH_STRIPE_KEY);
   return (
-    < StripeProvider publishableKey={PUBLISH_STRIPE_KEY}>
+    < StripeProvider publishableKey='pk_live_51QUJTeAYX90dZcYhXxLMV9CXUd8UEKTLSuyGrSoOMvnoMjkKAi6xYM0qnG498Drp1pRVGMyiWUsuR3AJOBowQ2LX00hmlBlDcx
+'>
      <UserContextProvider>
       <FavouritesProvider>
           <CartProvider>

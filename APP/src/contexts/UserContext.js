@@ -108,7 +108,7 @@ export const UserProvider = ({ children }) => {
   const logout = async () => {
     try {
       const response = await logoutUser(); // Removes token from AsyncStorage
-      console.log(response);
+      // console.log(response);
       
       // setUser(null);
       return response;
