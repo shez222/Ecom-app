@@ -45,15 +45,13 @@ const SettingsScreen = () => {
     // navigation.navigate('Login'); // Ensure 'Login' is defined in your navigation stack
     const response = await logout();
     // setLoading(false);
-    console.log("sdsd",response);
-
-    if (response) {
-      navigation.navigate('Login'); // Adjust as per your navigation structure
-    } else {
-      // setAlertTitle('Login Failed');
-      // setAlertMessage('Invalid email or password.');
-      // setAlertVisible(true);
-    }
+    // if (!response) {
+    //   navigation.navigate('Login'); // Adjust as per your navigation structure
+    // } else {
+    //   // setAlertTitle('Login Failed');
+    //   // setAlertMessage('Invalid email or password.');
+    //   // setAlertVisible(true);
+    // }
   };
 
   // Animation references for the back button

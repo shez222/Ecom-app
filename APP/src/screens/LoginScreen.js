@@ -87,13 +87,17 @@ const LoginScreen = () => {
     const response = await login(email, password);
     setLoading(false);
 
-    if (response.success) {
-      navigation.navigate('Main'); // Adjust as per your navigation structure
-    } else {
+    if (!response.success) {
+      // navigation.navigate('Main'); // Adjust as per your navigation structure
       setAlertTitle('Login Failed');
       setAlertMessage('Invalid email or password.');
       setAlertVisible(true);
-    }
+    } 
+    // else {
+    //   setAlertTitle('Login Failed');
+    //   setAlertMessage('Invalid email or password.');
+    //   setAlertVisible(true);
+    // }
   };
 
   // Function to handle closing the alert
