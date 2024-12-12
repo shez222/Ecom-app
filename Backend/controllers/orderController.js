@@ -27,9 +27,9 @@ console.log( totalPrice);
       amount:totalPrice, // Amount in cents
       currency: 'usd', // Change to your currency
       payment_method_types: ['card'],
-      automatic_payment_methods: {
-        enabled: true,
-      },
+      // automatic_payment_methods: {
+      //   enabled: true,
+      // },
       metadata: {
         userId: req.user._id.toString(),
       },
