@@ -1,7 +1,7 @@
 // src/navigation/AppNavigator.js
 
 import React, { useContext } from 'react';
-import { View, ActivityIndicator, Alert, StyleSheet } from 'react-native';
+import { View, ActivityIndicator, Alert, StyleSheet, Text } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -96,7 +96,7 @@ const MainTabNavigator = () => {
             return (
               <View style={{ width: 24, height: 24, margin: 5 }}>
                 <Ionicons name={iconName} size={size} color={color} />
-                {favouriteItems.length > 0 && (
+                {favouriteItems?.length > 0 && (
                   <View style={styles.badge}>
                     <Text style={styles.badgeText}>
                       {favouriteItems.length}
