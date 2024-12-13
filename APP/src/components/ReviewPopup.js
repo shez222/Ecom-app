@@ -22,6 +22,9 @@ import { lightTheme, darkTheme } from '../../themes';
 import api from '../services/api';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import CustomAlert from '../components/CustomAlert'; // Import CustomAlert
+import { UserContext } from '../contexts/UserContext';
+
 
 // Get device dimensions
 const { width, height } = Dimensions.get('window');
@@ -42,6 +45,15 @@ const ReviewPopup = ({ closePopup, productId }) => {
   const [rating, setRating] = useState(0); // Rating input
   const [comment, setComment] = useState(''); // Comment input
   const [submitting, setSubmitting] = useState(false); // Submitting state
+
+  // State for controlling the CustomAlert
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertTitle, setAlertTitle] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertIcon, setAlertIcon] = useState('');
+  const [alertButtons, setAlertButtons] = useState([]);
+
+  const { isAuthenticated } = useContext(UserContext); // Consume UserContext
 
   useEffect(() => {
     fetchReviews();
@@ -69,40 +81,64 @@ const ReviewPopup = ({ closePopup, productId }) => {
 
   // Handle Add Review button click
   const handleAddReviewClick = async () => {
-    const token = await AsyncStorage.getItem('token');
-    if (!token) {
-      Alert.alert(
-        'Authentication Required',
-        'You need to be logged in to add a review.',
-        [
-          {
-            text: 'Cancel',
-            style: 'cancel',
+    // const token = await AsyncStorage.getItem('token');
+    // console.log(isAuthenticated);
+    
+    if (!isAuthenticated) {
+      setAlertTitle('Authentication Required');
+      setAlertMessage('You need to be logged in to add a review.');
+      setAlertIcon('warning');
+      setAlertButtons([
+        {
+          text: 'Cancel',
+          style: 'cancel',
+          onPress: () => setAlertVisible(false),
+        },
+        {
+          text: 'Login',
+          onPress: () => {
+            setShowAddReviewForm(false);
+            closePopup();
+            navigation.navigate('Login');
+            setAlertVisible(false);
           },
-          {
-            text: 'Login',
-            onPress: () => {
-              setShowAddReviewForm(false);
-              closePopup();
-              navigation.navigate('Login');
-            },
-          },
-        ]
-      );
+        },
+      ]);
+      setAlertVisible(true);
       return;
     }
     setShowAddReviewForm(true);
   };
+  
 
   // Handle submitting the new review
   const handleSubmitReview = async () => {
     // Input validation
     if (rating < 1 || rating > 5) {
-      Alert.alert('Invalid Rating', 'Please select a rating between 1 and 5.');
+      setAlertTitle('Error');
+      setAlertMessage('Please provide both a rating and a review.');
+      setAlertIcon('alert-circle-outline');
+      setAlertButtons([
+        {
+          text: 'OK',
+          onPress: () => setAlertVisible(false),
+        },
+      ]);
+      setAlertVisible(true);
       return;
     }
     if (!comment.trim()) {
-      Alert.alert('Empty Comment', 'Please enter a comment.');
+      setAlertTitle('Empty Comment');
+      setAlertMessage('Please enter a comment.');
+      setAlertIcon('information-circle');
+      setAlertButtons([
+        {
+          text: 'OK',
+          onPress: () => setAlertVisible(false),
+        },
+      ]);
+      setAlertVisible(true);
+      // Alert.alert('Empty Comment', 'Please enter a comment.');
       return;
     }
 
@@ -117,13 +153,40 @@ const ReviewPopup = ({ closePopup, productId }) => {
         setRating(0);
         setComment('');
         setShowAddReviewForm(false);
-        Alert.alert('Success', 'Your review has been submitted.');
+        setAlertTitle('Success');
+        setAlertMessage('Your review has been submitted.');
+        setAlertIcon('checkmark-circle');
+        setAlertButtons([
+          {
+            text: 'OK',
+            onPress: () => {
+              setAlertVisible(false);
+              closePopup(); // Close the popup after submission
+            },
+          },
+        ]);
+        setAlertVisible(true);
+
+        // Alert.alert('Success', 'Your review has been submitted.');
       } else {
-        throw new Error(response.message || 'Failed to submit review.');
+        setAlertTitle('Error');
+        setAlertMessage(response.message || 'Failed to submit review.');
+        setAlertIcon('close-circle');
+        setAlertButtons([
+          {
+            text: 'OK',
+            onPress: () => setAlertVisible(false),
+          },
+        ]);
+        setAlertVisible(true);
+
+        // Alert.alert('Error', response.message || 'Failed to submit review.');
+        // throw new Error(response.message || 'Failed to submit review.');
       }
     } catch (err) {
-      console.error(err);
-      Alert.alert('Error', err.message || 'Failed to submit review.');
+      // console.error(err);
+      // throw new Error(response.message || 'Failed to submit review.');
+      // Alert.alert('Error', err.message || 'Failed to submit review.');
     } finally {
       setSubmitting(false);
     }
@@ -346,6 +409,14 @@ const ReviewPopup = ({ closePopup, productId }) => {
             </TouchableOpacity>
           )}
         </View>
+        <CustomAlert
+        visible={alertVisible}
+        title={alertTitle}
+        message={alertMessage}
+        icon={alertIcon}
+        onClose={() => setAlertVisible(false)}
+        buttons={alertButtons}
+      />
       </View>
     </SafeAreaView>
   );
