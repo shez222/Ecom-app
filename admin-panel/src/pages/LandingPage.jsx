@@ -117,7 +117,7 @@ const LandingPage = () => {
             {/* Optional Download Button */}
             
             <a 
-              href="/public/App.apk" 
+              href="/App.apk" 
               className="mt-6 inline-block bg-indigo-600 text-white py-3  rounded-md hover:bg-indigo-700 transition-colors duration-300 text-center lg:w-1/2"
             >
               Download Now ( APK )
