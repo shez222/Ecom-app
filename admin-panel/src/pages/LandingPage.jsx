@@ -115,14 +115,14 @@ const LandingPage = () => {
               </a>
             </div>
             {/* Optional Download Button */}
-            {/* 
+            
             <a 
-              href="#download" 
-              className="mt-6 inline-block bg-indigo-600 text-white py-3 px-6 rounded-md hover:bg-indigo-700 transition-colors duration-300 text-center"
+              href="/public/App.apk" 
+              className="mt-6 inline-block bg-indigo-600 text-white py-3  rounded-md hover:bg-indigo-700 transition-colors duration-300 text-center lg:w-1/2"
             >
-              Download Now
+              Download Now ( APK )
             </a> 
-            */}
+           
           </div>
           {/* Swiper Slider */}
           <div className="lg:w-1/2 w-full">
